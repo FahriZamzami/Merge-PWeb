@@ -194,6 +194,6 @@ app.get('/logout', (req, res) => {
 });
 
 // ===== START SERVER =====
-app.listen(8080, '0.0.0.0', () => {
-    console.log('🚀 Server berjalan di http://0.0.0.0:8080');
+app.listen(5000, '0.0.0.0', () => {
+    console.log('🚀 Server berjalan di http://0.0.0.0:5000');
 });
