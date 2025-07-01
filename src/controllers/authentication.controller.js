@@ -12,9 +12,8 @@ const login = async (req, res) => {
             return res.status(401).send('ID atau password salah');
         }
 
-        const isPasswordValid = user.peran === 'admin'
-            ? await bcrypt.compare(kata_sandi, user.kata_sandi)
-            : user.kata_sandi === kata_sandi;
+        // Always use bcrypt to compare passwords for all roles
+        const isPasswordValid = await bcrypt.compare(kata_sandi, user.kata_sandi);
 
         if (!isPasswordValid) {
             return res.status(401).send('ID atau password salah');
@@ -26,19 +25,15 @@ const login = async (req, res) => {
             peran: user.peran
         };
 
-        // Arahkan berdasarkan peran
+        // Redirect based on role
         if (user.peran === 'admin') {
-            return res.redirect('/admin/dashboard'); // Ganti dengan URL dashboard admin Anda
+            return res.redirect('/admin');
         }
         if (user.peran === 'asisten') {
             return res.redirect('/lab');
         }
         if (user.peran === 'mahasiswa') {
-            // ===================================================
-            // #### PERBAIKAN DI SINI ####
-            // Arahkan ke /welcome, BUKAN /home
-            // ===================================================
-            return res.redirect('/pilihLab'); 
+            return res.redirect('/dashboard-kelas');
         }
 
         return res.status(403).send('Peran tidak dikenali');
