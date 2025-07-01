@@ -37,7 +37,7 @@
                             <th class="px-5 py-3">NIM</th>
                             <th class="px-5 py-3">Nama Mahasiswa</th>
                             <% jadwalList.forEach((jadwal) => { %>
-                                <th class="px-5 py-3 text-center">Pertemuan <%= jadwal.id %></th>
+                                <th class="px-5 py-3 text-center"><%= jadwal.materi %></th>
                             <% }) %>
                             <th class="px-5 py-3 text-center bg-green-100">Total Hadir</th>
                             <th class="px-5 py-3 text-center bg-red-100">Total Tdk Hadir</th>

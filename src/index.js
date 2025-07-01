@@ -194,6 +194,6 @@ app.get('/logout', (req, res) => {
 });
 
 // ===== START SERVER =====
-app.listen(3000, () => {
-    console.log('🚀 Server berjalan di http://localhost:3000');
+app.listen(3001, () => {
+    console.log('🚀 Server berjalan di http://localhost:3001');
 });

@@ -145,5 +145,5 @@ module.exports = {
     getAbsensiPage, 
     saveAbsensi, 
     getDetailKehadiranPage,
-    getRekapKehadiranData // Ekspor helper agar bisa digunakan controller lain
+    getRekapKehadiranData
 };
