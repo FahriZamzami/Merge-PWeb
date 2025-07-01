@@ -3,7 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const prisma = require('../lib/prisma');
-const bcrypt = require('bcrypt');
+//const bcrypt = require('bcrypt');
 
 const statusFile = path.join(__dirname, '..', '..', 'status.json');
 
@@ -138,18 +138,18 @@ router.post('/user/create', async (req, res) => {
 
     // Validate required fields
     if (!nim || !nama || !username || !password || !peran || (peran === 'asisten' && !lab_id)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Semua field harus diisi' 
+      return res.status(400).json({
+        success: false,
+        message: 'Semua field harus diisi'
       });
     }
 
     // Convert peran to lowercase and validate
     const peranLower = peran.toLowerCase();
     if (!['admin', 'mahasiswa', 'asisten'].includes(peranLower)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Peran harus admin, mahasiswa, atau asisten' 
+      return res.status(400).json({
+        success: false,
+        message: 'Peran harus admin, mahasiswa, atau asisten'
       });
     }
 
@@ -163,14 +163,14 @@ router.post('/user/create', async (req, res) => {
       }
     });
     if (existingUser) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'NIM atau Username sudah digunakan' 
+      return res.status(400).json({
+        success: false,
+        message: 'NIM atau Username sudah digunakan'
       });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // The password is no longer hashed. It will be stored in plain text.
+    // const hashedPassword = await bcrypt.hash(password, 10); // Hashing removed as requested
 
     // Transaction: create user and asistenLab atomically
     await prisma.$transaction(async (tx) => {
@@ -179,7 +179,8 @@ router.post('/user/create', async (req, res) => {
         data: {
           id: nim,
           username: username,
-          kata_sandi: hashedPassword,
+          // Storing the plain text password directly
+          kata_sandi: password,
           peran: peranLower
         }
       });
@@ -200,8 +201,8 @@ router.post('/user/create', async (req, res) => {
       }
     });
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'User berhasil ditambahkan',
       user: {
         id: nim,
@@ -215,9 +216,9 @@ router.post('/user/create', async (req, res) => {
     if (error.message && error.message.includes('Lab ID tidak valid')) {
       msg = 'Lab ID tidak valid atau tidak ditemukan';
     }
-    res.status(500).json({ 
-      success: false, 
-      message: msg 
+    res.status(500).json({
+      success: false,
+      message: msg
     });
   }
 });
