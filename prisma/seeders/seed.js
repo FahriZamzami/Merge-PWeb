@@ -7,17 +7,15 @@ const prisma = new PrismaClient();
 async function main() {
     console.log('Memulai proses seeding... 🌱');
 
-    // 1. Hash kata sandi yang dibutuhkan (hanya untuk admin)
+    // 1. Hash semua kata sandi yang dibutuhkan
     const saltRounds = 10; // Standar industri untuk hashing
-    console.log('Menyiapkan dan mengenkripsi kata sandi admin...');
+    console.log('Menyiapkan dan mengenkripsi kata sandi...');
+
     const adminPassword = await bcrypt.hash('sayasukadurian', saltRounds);
-    console.log('Kata sandi admin berhasil dienkripsi. ✅');
+    const mahasiswaPassword = await bcrypt.hash('password123', saltRounds); // HASHED
+    const asistenPassword = await bcrypt.hash('labkece123', saltRounds);   // HASHED
 
-    // Kata sandi untuk mahasiswa dan asisten tidak di-hash
-    const mahasiswaPassword = 'password123';
-    const asistenPassword = 'labkece123';
-    console.log('Kata sandi untuk mahasiswa dan asisten menggunakan teks biasa. 📝');
-
+    console.log('Semua kata sandi berhasil dienkripsi. ✅');
 
     // 2. Membersihkan data lama untuk menghindari konflik
     console.log('Membersihkan data lama dari database...');
@@ -48,7 +46,7 @@ async function main() {
     });
     console.log('Tabel `Lab` berhasil di-seed.');
 
-    // Tabel User dengan kata sandi sesuai peran
+    // Tabel User dengan kata sandi sesuai peran (SEMUA DI-HASH)
     const users = [
         { id: '02', username: 'della', peran: 'mahasiswa' },
         { id: '2311522031', username: 'Pablo', peran: 'mahasiswa' },
@@ -76,13 +74,13 @@ async function main() {
         let kata_sandi;
         switch (user.peran) {
             case 'admin':
-                kata_sandi = adminPassword; // Kata sandi di-hash
+                kata_sandi = adminPassword;
                 break;
             case 'asisten':
-                kata_sandi = asistenPassword; // Kata sandi teks biasa
+                kata_sandi = asistenPassword;
                 break;
             case 'mahasiswa':
-                kata_sandi = mahasiswaPassword; // Kata sandi teks biasa
+                kata_sandi = mahasiswaPassword;
                 break;
         }
         return { ...user, kata_sandi };
@@ -169,7 +167,6 @@ async function main() {
     console.log('Tabel `Pengumpulan` berhasil di-seed.');
 
     console.log('\nProses seeding selesai dengan sukses! 🎉');
-
 }
 
 main()
