@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt'); // bcrypt tidak lagi diperlukan
 
 const prisma = new PrismaClient();
 
@@ -10,7 +10,6 @@ const showRegisterPage = (req, res) => {
     res.render('register', { step: 1, error: null, nama: '', nim: '' });
 };
 
-// Proses input nama & NIM (lanjut ke buat password)
 // Proses input nama & NIM (lanjut ke buat password)
 const handleFirstStep = async (req, res) => {
     const { nama, nim } = req.body;
@@ -43,7 +42,6 @@ const handleRegisterCreate = async (req, res) => {
     console.log('📥 req.body:', req.body);
     console.log('📥 session:', req.session);
 
-
     const nama = req.session.nama;
     const nim = req.session.nim;
     const { password, verifikasi_password } = req.body;
@@ -67,14 +65,17 @@ const handleRegisterCreate = async (req, res) => {
     }
 
     const username = nama; // atau bisa juga const username = nama;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // --- PERUBAHAN ---
+    // Hapus hashing, langsung gunakan password dari form
+    // const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
         await prisma.user.create({
             data: {
                 id: nim,
                 username: username,
-                kata_sandi: hashedPassword,
+                kata_sandi: password, // Simpan password sebagai plain text
                 peran: 'mahasiswa',
                 dibuat_pada: new Date()
             },
