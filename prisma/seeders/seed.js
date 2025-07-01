@@ -7,13 +7,17 @@ const prisma = new PrismaClient();
 async function main() {
     console.log('Memulai proses seeding... 🌱');
 
-    // 1. Hash semua kata sandi yang dibutuhkan
+    // 1. Hash kata sandi yang dibutuhkan (hanya untuk admin)
     const saltRounds = 10; // Standar industri untuk hashing
-    console.log('Menyiapkan dan mengenkripsi kata sandi...');
+    console.log('Menyiapkan dan mengenkripsi kata sandi admin...');
     const adminPassword = await bcrypt.hash('sayasukadurian', saltRounds);
-    const mahasiswaPassword = await bcrypt.hash('password123', saltRounds);
-    const asistenPassword = await bcrypt.hash('labkece123', saltRounds);
-    console.log('Kata sandi berhasil dienkripsi. ✅');
+    console.log('Kata sandi admin berhasil dienkripsi. ✅');
+
+    // Kata sandi untuk mahasiswa dan asisten tidak di-hash
+    const mahasiswaPassword = 'password123';
+    const asistenPassword = 'labkece123';
+    console.log('Kata sandi untuk mahasiswa dan asisten menggunakan teks biasa. 📝');
+
 
     // 2. Membersihkan data lama untuk menghindari konflik
     console.log('Membersihkan data lama dari database...');
@@ -44,7 +48,7 @@ async function main() {
     });
     console.log('Tabel `Lab` berhasil di-seed.');
 
-    // Tabel User dengan kata sandi yang sudah di-hash sesuai peran
+    // Tabel User dengan kata sandi sesuai peran
     const users = [
         { id: '02', username: 'della', peran: 'mahasiswa' },
         { id: '2311522031', username: 'Pablo', peran: 'mahasiswa' },
@@ -68,24 +72,24 @@ async function main() {
         { id: 'asllea001', username: 'Vannesa Tania', peran: 'asisten' },
     ];
 
-    const usersWithHashedPasswords = users.map(user => {
+    const usersWithPasswords = users.map(user => {
         let kata_sandi;
         switch (user.peran) {
             case 'admin':
-                kata_sandi = adminPassword;
+                kata_sandi = adminPassword; // Kata sandi di-hash
                 break;
             case 'asisten':
-                kata_sandi = asistenPassword;
+                kata_sandi = asistenPassword; // Kata sandi teks biasa
                 break;
             case 'mahasiswa':
-                kata_sandi = mahasiswaPassword;
+                kata_sandi = mahasiswaPassword; // Kata sandi teks biasa
                 break;
         }
         return { ...user, kata_sandi };
     });
 
     await prisma.user.createMany({
-        data: usersWithHashedPasswords,
+        data: usersWithPasswords,
     });
     console.log('Tabel `User` berhasil di-seed.');
 
