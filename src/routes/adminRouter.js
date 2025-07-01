@@ -3,6 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const prisma = require('../lib/prisma');
+const bcrypt = require('bcrypt');
 
 const statusFile = path.join(__dirname, '..', '..', 'status.json');
 
@@ -105,7 +106,10 @@ res.status(500).render('error', {
 }
 });
 
-router.get('/user/tambah', (req, res) => res.render('user_tambah', { title: 'Tambah User' }));
+router.get('/user/tambah', async (req, res) => {
+  const labs = await prisma.lab.findMany({ orderBy: { nama_lab: 'asc' } });
+  res.render('user_tambah', { title: 'Tambah User', labs });
+});
 
 router.get('/user/hapus', async (req, res) => {
 try {
@@ -129,79 +133,102 @@ res.status(500).render('error', {
 
 // Database routes for user management
 router.post('/user/create', async (req, res) => {
-try {
-const { nama, username, password, peran } = req.body;
+  try {
+    const { nim, nama, username, password, peran, lab_id } = req.body;
 
-console.log('Received data:', { nama, username, password, peran }); // Debug log
-
-// Validate required fields
-if (!nama || !username || !password || !peran) {
-    return res.status(400).json({ 
-    success: false, 
-    message: 'Semua field harus diisi' 
-    });
-}
-
-// Convert peran to lowercase and validate
-const peranLower = peran.toLowerCase();
-console.log('Converted peran:', peranLower); // Debug log
-
-if (!['admin', 'mahasiswa', 'asisten'].includes(peranLower)) {
-    return res.status(400).json({ 
-    success: false, 
-    message: 'Peran harus admin, mahasiswa, atau asisten' 
-    });
-}
-
-// Check if username already exists
-const existingUser = await prisma.user.findUnique({
-    where: { username }
-});
-
-if (existingUser) {
-    return res.status(400).json({ 
-    success: false, 
-    message: 'Username sudah digunakan' 
-    });
-}
-
-// Create new user
-const newUser = await prisma.user.create({
-    data: {
-    id: username, // Using username as ID
-    fullName: nama,
-    username: username,
-    kata_sandi: password, // In production, hash this password
-    peran: peranLower
+    // Validate required fields
+    if (!nim || !nama || !username || !password || !peran || (peran === 'asisten' && !lab_id)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Semua field harus diisi' 
+      });
     }
-});
 
-res.json({ 
-    success: true, 
-    message: 'User berhasil ditambahkan',
-    user: {
-    id: newUser.id,
-    fullName: newUser.fullName,
-    username: newUser.username,
-    peran: newUser.peran
+    // Convert peran to lowercase and validate
+    const peranLower = peran.toLowerCase();
+    if (!['admin', 'mahasiswa', 'asisten'].includes(peranLower)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Peran harus admin, mahasiswa, atau asisten' 
+      });
     }
-});
-} catch (error) {
-console.error('Error creating user:', error);
-res.status(500).json({ 
-    success: false, 
-    message: 'Terjadi kesalahan saat menambah user' 
-});
-}
+
+    // Check if NIM or username already exists
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { id: nim },
+          { username: username }
+        ]
+      }
+    });
+    if (existingUser) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'NIM atau Username sudah digunakan' 
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Transaction: create user and asistenLab atomically
+    await prisma.$transaction(async (tx) => {
+      // Create new user
+      await tx.user.create({
+        data: {
+          id: nim,
+          username: username,
+          kata_sandi: hashedPassword,
+          peran: peranLower
+        }
+      });
+
+      // If asisten, create asistenLab entry
+      if (peranLower === 'asisten') {
+        // Pastikan lab_id valid dan numerik
+        const labIdInt = parseInt(lab_id);
+        if (isNaN(labIdInt)) {
+          throw new Error('Lab ID tidak valid');
+        }
+        await tx.asistenLab.create({
+          data: {
+            user_id: nim,
+            lab_id: labIdInt
+          }
+        });
+      }
+    });
+
+    res.json({ 
+      success: true, 
+      message: 'User berhasil ditambahkan',
+      user: {
+        id: nim,
+        username: username,
+        peran: peranLower
+      }
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    let msg = 'Terjadi kesalahan saat menambah user';
+    if (error.message && error.message.includes('Lab ID tidak valid')) {
+      msg = 'Lab ID tidak valid atau tidak ditemukan';
+    }
+    res.status(500).json({ 
+      success: false, 
+      message: msg 
+    });
+  }
 });
 
 router.put('/user/update/:id', async (req, res) => {
 try {
 const { id } = req.params;
-const { nama, username, peran } = req.body;
+const { username, peran } = req.body;
 
 // Validate required fields
-if (!nama || !username || !peran) {
+if (!username || !peran) {
     return res.status(400).json({ 
     success: false, 
     message: 'Semua field harus diisi' 
@@ -236,7 +263,6 @@ if (existingUser) {
 const updatedUser = await prisma.user.update({
     where: { id },
     data: {
-    fullName: nama,
     username: username,
     peran: peranLower
     }
@@ -247,7 +273,6 @@ res.json({
     message: 'User berhasil diperbarui',
     user: {
     id: updatedUser.id,
-    fullName: updatedUser.fullName,
     username: updatedUser.username,
     peran: updatedUser.peran
     }
@@ -421,14 +446,19 @@ const { judul, isi } = req.body;
 if (!isi) {
     return res.status(400).json({ success: false, message: 'Isi pengumuman harus diisi' });
 }
+// Ambil id admin dari session
+const adminUser = req.session && req.session.user && req.session.user.id ? req.session.user.id : null;
+if (!adminUser) {
+    return res.status(401).json({ success: false, message: 'Anda harus login sebagai admin untuk membuat pengumuman' });
+}
 // Gabungkan judul dan isi jika ada judul
 const fullContent = judul ? `${judul}: ${isi}` : isi;
-// Simpan ke database (praktikum_id: 8, dibuat_oleh: 'adm001')
+// Simpan ke database (praktikum_id: 8, dibuat_oleh: adminUser)
 const announcement = await prisma.pengumuman.create({
     data: {
     isi: fullContent,
     praktikum_id: 8,
-    dibuat_oleh: 'adm001'
+    dibuat_oleh: adminUser
     }
 });
 res.json({ success: true, message: 'Pengumuman berhasil dipublikasikan', announcement });
@@ -445,7 +475,6 @@ const announcements = await prisma.pengumuman.findMany({
     include: {
     pembuat: {
         select: {
-        fullName: true,
         username: true
         }
     }
@@ -459,7 +488,7 @@ res.json({
     announcements: announcements.map(ann => ({
     id: ann.id,
     isi: ann.isi,
-    dibuat_oleh: ann.pembuat?.fullName || ann.pembuat?.username || ann.dibuat_oleh,
+    dibuat_oleh: ann.pembuat?.username || ann.dibuat_oleh,
     dibuat_pada: ann.dibuat_pada
     }))
 });
@@ -523,7 +552,6 @@ const announcements = await prisma.pengumuman.findMany({
     include: {
     pembuat: {
         select: {
-        fullName: true,
         username: true
         }
     }
@@ -538,7 +566,7 @@ res.json({
     announcements: announcements.map(ann => ({
     id: ann.id,
     isi: ann.isi,
-    dibuat_oleh: ann.pembuat?.fullName || ann.pembuat?.username || ann.dibuat_oleh,
+    dibuat_oleh: ann.pembuat?.username || ann.dibuat_oleh,
     dibuat_pada: ann.dibuat_pada
     }))
 });
@@ -873,7 +901,6 @@ const assistants = await prisma.asistenLab.findMany({
     include: {
     user: {
         select: {
-        fullName: true,
         username: true
         }
     }
@@ -895,7 +922,6 @@ const students = await prisma.mahasiswa.findMany({
     include: {
     user: {
         select: {
-        fullName: true,
         username: true
         }
     }
@@ -936,8 +962,8 @@ const labDetail = {
     jumlahModul: modules.length,
     jumlahKelas: praktikum.length,
     jumlahMahasiswa: students.length,
-    asisten: assistants.map(a => a.user.fullName || a.user.username),
-    mahasiswa: students.map(s => s.user.fullName || s.user.username),
+    asisten: assistants.map(a => a.user.username),
+    mahasiswa: students.map(s => s.user.username),
     jadwalKelas: schedules.map(s => {
     const date = new Date(s.tanggal);
     const time = new Date(s.jam);
@@ -1023,7 +1049,6 @@ const submissions = await prisma.pengumpulan.findMany({
     },
     user: {
         select: {
-        fullName: true,
         username: true
         }
     }
@@ -1070,7 +1095,7 @@ for (let i = 5; i >= 0; i--) {
 const recentSubmissions = submissions.slice(0, 10).map(s => ({
     id: s.id,
     taskTitle: s.tugas.judul,
-    studentName: s.user.fullName || s.user.username,
+    studentName: s.user.username,
     submittedAt: s.waktu_kirim,
     score: s.nilai,
     status: s.nilai !== null ? 'Completed' : 'Pending'

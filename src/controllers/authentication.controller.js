@@ -12,8 +12,17 @@ const login = async (req, res) => {
             return res.status(401).send('ID atau password salah');
         }
 
+        console.log('🧪 Input password:', kata_sandi);
+        console.log('🧪 Stored hash   :', user.kata_sandi);
+        console.log('🧪 Input password:', kata_sandi);
+        console.log('🧪 Stored hash   :', user.kata_sandi);
+
         // Always use bcrypt to compare passwords for all roles
         const isPasswordValid = await bcrypt.compare(kata_sandi, user.kata_sandi);
+
+        
+        console.log('Password length:', kata_sandi.length);
+        console.log('Password bytes:', [...Buffer.from(kata_sandi)]);
 
         if (!isPasswordValid) {
             return res.status(401).send('ID atau password salah');
