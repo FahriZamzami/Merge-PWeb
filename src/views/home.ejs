@@ -4,122 +4,90 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Utama</title>
+    <!-- [FIX] Title dibuat dinamis sesuai dengan nama praktikum -->
+    <title>Dashboard - <%= praktikum.nama_praktikum %></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-      .subtle-hover {
-        transition: all 0.3s ease;
-      }
-      .subtle-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-      }
-      .gradient-text {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
+      .subtle-hover { transition: all 0.3s ease; }
+      .subtle-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+      .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     </style>
   </head>
   <body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <div class="flex min-h-screen">
-      <%- include('partials/homeSidebar', { currentPath: currentPath }) %>
+      
+      <!-- [FIX] Sidebar di-include dengan mengirimkan data praktikum agar link di sidebar juga dinamis -->
+      <%- include('partials/sidebarMahasiswa', { currentPage: currentPage, praktikum: praktikum }) %>
 
       <main class="flex-1 p-6 lg:p-8 max-w-6xl mx-auto">
-        <!-- Welcome Section -->
+        <!-- [FIX] Welcome Section disesuaikan untuk menampilkan nama praktikum yang aktif -->
         <div class="text-center mb-12">
           <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-6">
             <i class="fas fa-flask text-white text-3xl"></i>
           </div>
           <h1 class="text-4xl lg:text-5xl font-bold gradient-text mb-4">
-            Selamat Datang di LabCorner! 🎉
+            <%= praktikum.nama_praktikum %>
           </h1>
           <p class="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Platform praktikum yang memudahkan mahasiswa dalam mengakses materi, tugas, dan jadwal praktikum dengan pengalaman yang menyenangkan.
+            Selamat datang di halaman utama praktikum. Kelola semua aktivitas Anda dari sini.
           </p>
         </div>
 
-        <!-- Success Card -->
-        <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border-l-4 border-green-500">
-          <div class="flex items-center">
-            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
-              <i class="fas fa-check-circle text-green-600 text-xl"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-1">Berhasil Bergabung!</h3>
-              <p class="text-gray-600">Anda telah berhasil bergabung dengan praktikum: <span class="font-medium text-blue-600">Data Mining</span></p>
-            </div>
-          </div>
-        </div>
+        <!-- [REMOVED] Kartu "Berhasil Bergabung" yang statis dihapus agar UI lebih bersih dan tidak muncul setiap saat. -->
 
         <!-- Quick Actions -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- [FIX] Link Modul Materi dibuat dinamis -->
           <div class="bg-white rounded-xl shadow-lg p-6 subtle-hover border border-gray-100">
             <div class="flex items-center mb-4">
-              <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                <i class="fas fa-book-open text-blue-600"></i>
-              </div>
+              <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3"><i class="fas fa-book-open text-blue-600"></i></div>
               <h3 class="text-lg font-semibold text-gray-900">Modul Materi</h3>
             </div>
             <p class="text-gray-600 mb-4">Akses materi pembelajaran dan modul praktikum yang telah disediakan.</p>
-              <a href="/modulMateri" class="inline-flex items-center text-blue-600 font-medium hover:text-blue-700 text-sm">
-                Lihat Materi <i class="fas fa-arrow-right ml-2"></i>
-              </a>
+            <a href="/modul-materi" class="inline-flex items-center text-blue-600 font-medium hover:text-blue-700 text-sm">
+              Lihat Materi <i class="fas fa-arrow-right ml-2"></i>
+            </a>
           </div>
 
+          <!-- [FIX] Link Tugas Praktikum disesuaikan. Controller 'assignments' akan menggunakan session untuk konteks kelas. -->
           <div class="bg-white rounded-xl shadow-lg p-6 subtle-hover border border-gray-100">
             <div class="flex items-center mb-4">
-              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                <i class="fas fa-tasks text-green-600"></i>
-              </div>
+              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3"><i class="fas fa-tasks text-green-600"></i></div>
               <h3 class="text-lg font-semibold text-gray-900">Tugas Praktikum</h3>
             </div>
             <p class="text-gray-600 mb-4">Lihat dan kumpulkan tugas praktikum yang telah diberikan.</p>
-              <a href="/tugas" class="inline-flex items-center text-green-600 font-medium hover:text-green-700 text-sm">
-                Lihat Tugas <i class="fas fa-arrow-right ml-2"></i>
-              </a>
+            <a href="/tugas" class="inline-flex items-center text-green-600 font-medium hover:text-green-700 text-sm">
+              Lihat Tugas <i class="fas fa-arrow-right ml-2"></i>
+            </a>
           </div>
 
+          <!-- [FIX] Link Jadwal Praktikum dibuat dinamis -->
           <div class="bg-white rounded-xl shadow-lg p-6 subtle-hover border border-gray-100">
             <div class="flex items-center mb-4">
-              <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                <i class="fas fa-calendar-alt text-purple-600"></i>
-              </div>
+              <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3"><i class="fas fa-calendar-alt text-purple-600"></i></div>
               <h3 class="text-lg font-semibold text-gray-900">Jadwal Praktikum</h3>
             </div>
             <p class="text-gray-600 mb-4">Periksa jadwal praktikum dan informasi pertemuan.</p>
-              <a href="/jadwal" class="inline-flex items-center text-purple-600 font-medium hover:text-purple-700 text-sm">
-                Lihat Jadwal <i class="fas fa-arrow-right ml-2"></i>
-              </a>
+            <a href="/jadwal-kelas" class="inline-flex items-center text-purple-600 font-medium hover:text-purple-700 text-sm">
+              Lihat Jadwal <i class="fas fa-arrow-right ml-2"></i>
+            </a>
           </div>
         </div>
 
         <!-- Tips Section -->
         <div class="mt-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8 border border-blue-100">
-          <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
-            Tips Menggunakan LabCorner
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-            <div class="flex items-start">
-              <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-              <span>Selalu periksa jadwal praktikum sebelum pertemuan</span>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
+                Tips Menggunakan LabCorner
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                <div class="flex items-start"><i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i><span>Selalu periksa jadwal praktikum sebelum pertemuan</span></div>
+                <div class="flex items-start"><i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i><span>Kumpulkan tugas tepat waktu untuk nilai optimal</span></div>
+                <div class="flex items-start"><i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i><span>Download dan pelajari modul materi sebelum praktikum</span></div>
+                <div class="flex items-start"><i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i><span>Hubungi asisten lab jika ada pertanyaan</span></div>
             </div>
-            <div class="flex items-start">
-              <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-              <span>Kumpulkan tugas tepat waktu untuk nilai optimal</span>
-            </div>
-            <div class="flex items-start">
-              <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-              <span>Download dan pelajari modul materi sebelum praktikum</span>
-            </div>
-            <div class="flex items-start">
-              <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-              <span>Hubungi asisten lab jika ada pertanyaan</span>
-            </div>
-          </div>
         </div>
       </main>
     </div>

@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `jadwal` MODIFY `dibuat_pada` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3);

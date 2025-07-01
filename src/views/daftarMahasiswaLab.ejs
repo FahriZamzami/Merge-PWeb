@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title><%= title %></title>
+</head>
+<body class="bg-slate-50">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4 flex-shrink-0">
+            <div class="flex items-center justify-between p-4">
+                <h1 class="text-2xl font-bold tracking-wider">LABCORNER</h1>
+                <button class="lg:hidden">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+            <nav class="flex-1 px-2 mt-8 space-y-3">
+                <a href="/lab" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9.5L12 2L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="font-semibold">Home Lab</span>
+                </a>
+                <a href="/lab/<%= lab.id %>/jadwal" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2V5M16 2V5M3 8H21M5 22H19C20.1046 22 21 21.1046 21 20V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 3 3.89543 3 5V20C3 21.1046 3.89543 22 5 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="font-medium">Jadwal Lab</span>
+                </a>
+                <a href="/lab/<%= lab.id %>/mahasiswa" class="flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 21V19C22.9992 17.9831 22.5932 17.0132 21.8727 16.2927C21.1522 15.5722 20.1824 15.1662 19.165 15.13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 11C18.8475 10.9992 20.4839 9.59382 20.8942 7.8249C21.3045 6.05598 20.4787 4.25338 18.9416 3.23863C17.4045 2.22388 15.4673 2.20339 13.9055 3.18516" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="font-semibold">Semua Mahasiswa Lab</span>
+                </a>
+            </nav>
+            <div class="mt-auto p-2">
+                <a href="/kelas/tambah" class="flex items-center space-x-4 p-3 rounded-lg text-white/90 hover:bg-white/10 border-2 border-white/30">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path></svg>
+                    <span class="font-semibold">Tambah Kelas</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            
+            <div class="max-w-7xl mx-auto">
+
+                <div class="bg-gradient-to-br from-violet-700 to-purple-400 p-6 sm:p-8 rounded-2xl shadow-lg">
+
+                    <header class="flex flex-wrap gap-4 justify-between items-center mb-8">
+                        <div>
+                            <h1 class="text-4xl font-extrabold text-white tracking-tight">Daftar Mahasiswa Lab</h1>
+                            <p class="text-purple-200 mt-1">Lab: <%= lab.nama_lab %></p>
+                            <p class="text-purple-200 text-sm">Total: <%= mahasiswaList.length %> mahasiswa</p>
+                        </div>
+                        <div class="flex items-center space-x-2 sm:space-x-3">
+                            <a href="/lab" class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-white/20 transition">
+                                <i class="fa-solid fa-arrow-left w-4 h-4"></i>
+                                <span>Kembali</span>
+                            </a>
+                        </div>
+                    </header>
+
+                    <div class="mb-6">
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <i class="fa-solid fa-search text-slate-400"></i>
+                            </div>
+                            <input type="text" id="mahasiswaSearch" class="block w-full rounded-md border-slate-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-slate-500 shadow-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500" placeholder="Cari berdasarkan nama, NIM, atau kelas...">
+                        </div>
+                    </div>
+        
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden ring-1 ring-black/5">
+                        <table class="min-w-full">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">No</th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Nama Mahasiswa</th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Kelas</th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Waktu Daftar</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <% if (mahasiswaList.length > 0) { %>
+                                    <% mahasiswaList.forEach((mhs, index) => { %>
+                                        <tr class="mahasiswa-row odd:bg-white even:bg-slate-50 hover:bg-purple-50 transition-colors">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500"><%= index + 1 %>.</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <p class="text-sm font-semibold text-slate-900"><%= mhs.user.username %></p>
+                                                <p class="text-xs text-slate-500 font-mono"><%= mhs.user.id %></p>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                    <%= mhs.praktikum.nama_praktikum %>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                                                <p><%= new Date(mhs.waktu_daftar).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
+                                                <p class="text-xs text-slate-500"><%= new Date(mhs.waktu_daftar).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %> WIB</p>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                    <tr id="no-results" class="hidden">
+                                        <td colspan="4" class="text-center py-16 text-slate-500">
+                                            <i class="fa-solid fa-magnifying-glass-minus text-4xl text-slate-300 mb-4"></i>
+                                            <p>Mahasiswa tidak ditemukan.</p>
+                                        </td>
+                                    </tr>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="4" class="text-center py-16 text-slate-500">
+                                            <i class="fa-solid fa-users-slash text-4xl text-slate-300 mb-4"></i>
+                                            <p>Belum ada mahasiswa yang terdaftar pada lab ini.</p>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('mahasiswaSearch');
+            const rows = document.querySelectorAll('.mahasiswa-row');
+            const noResultsRow = document.getElementById('no-results');
+
+            if (rows.length === 0) {
+                searchInput.disabled = true;
+                return;
+            }
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = searchInput.value.toLowerCase();
+                let visibleRowCount = 0;
+
+                rows.forEach(function(row) {
+                    const name = row.cells[1].querySelector('p.font-semibold').textContent.toLowerCase();
+                    const nim = row.cells[1].querySelector('p.font-mono').textContent.toLowerCase();
+                    const kelas = row.cells[2].querySelector('span').textContent.toLowerCase();
+                    
+                    if (name.includes(searchTerm) || nim.includes(searchTerm) || kelas.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleRowCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                if (noResultsRow) {
+                    if (visibleRowCount === 0) {
+                        noResultsRow.classList.remove('hidden');
+                    } else {
+                        noResultsRow.classList.add('hidden');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,4 +1,4 @@
-<aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4">
+<aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4 h-screen sticky top-0">
     <div class="p-4">
         <a href="/lab"><h1 class="text-2xl font-bold mb-8 tracking-wider">LABCORNER</h1></a>
     </div>
@@ -12,64 +12,65 @@
                 </a>
             </li>
 
-            <% if (typeof praktikum !== 'undefined' && praktikum) { %>
+            <% if (typeof praktikum !== 'undefined' && praktikum.id) { %>
                 <hr class="border-t border-white/20 my-4">
                 <li>
                     <a href="/kelas/<%= praktikum.id %>" class="<%= currentPath.startsWith('/kelas') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.66.537-1.197 1.197-1.197h.006c.66 0 1.197.537 1.197 1.197v7.506c0 .66-.537 1.197-1.197 1.197h-.006c-.66 0-1.197-.537-1.197-1.197V6.087zM6.75 6.087c0-.66.537-1.197 1.197-1.197h.006c.66 0 1.197.537 1.197 1.197v7.506c0 .66-.537 1.197-1.197 1.197h-.006C7.287 14.79 6.75 14.253 6.75 13.593V6.087z" /><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 6.087v10.55c0 .858.692 1.55 1.55 1.55h10.4c.858 0 1.55-.692 1.55-1.55V6.087" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0l15.482 0m-15.482 0l15.482 0" /></svg>
                         <span class="font-medium"><%= praktikum.nama_praktikum %></span>
                     </a>
                 </li>
 
                 <li>
-                    <a href="/praktikum/<%= praktikum.id %>/modul"
-                        class="<%= currentPath.includes('/modul') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                    <a href="/praktikum/<%= praktikum.id %>/modul" class="<%= currentPath.includes('/modul') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
                         <span class="font-medium">Modul Materi</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="/praktikum/<%= praktikum.id %>/pengumuman" class="<%= currentPath.includes('/pengumuman') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 3.34a1.5 1.5 0 011.32 0l6.36 3.69a1.5 1.5 0 01.88 1.34V16.5a1.5 1.5 0 01-1.5 1.5H3.14a1.5 1.5 0 01-1.5-1.5V8.37a1.5 1.5 0 01.88-1.34l6.36-3.69zM10.34 3.34L3.74 7.5M10.34 3.34l6.6 4.16M17 18v-2.55a1.5 1.5 0 00-1.5-1.5H8.55a1.5 1.5 0 00-1.5 1.5V18m10 0h-10" /></svg>
+                        <span class="font-medium">Pengumuman</span>
                     </a>
                 </li>
 
                 <li>
                     <% const isAssignmentPage = currentPath.startsWith('/assignments') || currentPath.startsWith('/penugasan'); %>
-                    <a href="/assignments"
-                        class="<%= isAssignmentPage ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                    <a href="/assignments" class="<%= isAssignmentPage ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <span class="font-semibold">Penugasan</span>
                     </a>
                 </li>
 
                 <li>
-                    <a href="/praktikum/<%= praktikum.id %>/kuis"
-                       class="<%= currentPath.includes('/kuis') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h8.25M8.25 12h5.25M8.25 17.25h8.25M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                        </svg>
+                    <a href="/praktikum/<%= praktikum.id %>/kuis" class="<%= currentPath.includes('/kuis') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h8.25M8.25 12h5.25M8.25 17.25h8.25M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
                         <span class="font-medium">Kuis</span>
                     </a>
                 </li>
 
                 <li>
-                    <a href="/praktikum/<%= praktikum.id %>/jadwal"
-                        class="<%= currentPath.includes('/jadwal') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                    <a href="/praktikum/<%= praktikum.id %>/jadwal" class="<%= currentPath.includes('/jadwal') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18M-4.5 12h22.5" /></svg>
                         <span class="font-medium">Jadwal Praktikum</span>
                     </a>
                 </li>
+                
                 <li>
-                    <a href="/praktikum/<%= praktikum.id %>/mahasiswa"
-                        class="<%= currentPath.includes('/mahasiswa') || currentPath.includes('/absensi') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
-                        <i class="fa-solid fa-users w-6 h-6 flex items-center justify-center"></i>
+                    <a href="/praktikum/<%= praktikum.id %>/mahasiswa" class="<%= currentPath.includes('/mahasiswa') || currentPath.includes('/absensi') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.5-2.962a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <span class="font-medium">Daftar Mahasiswa</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/praktikum/<%= praktikum.id %>/pengumuman"
-                    class="<%= currentPath.includes('/pengumuman') ? 'flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20' : 'flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10' %>">
-                        <i class="fa-solid fa-bullhorn h-6 w-6"></i>
-                        <span class="font-medium">Pengumuman</span>
                     </a>
                 </li>
             <% } %>
         </ul>
     </nav>
+    <!-- Logout Button -->
+    <div class="mt-auto p-2">
+        <a href="/logout" class="flex items-center space-x-4 p-3 rounded-lg text-white/90 bg-red-500 hover:bg-red-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H3"></path></svg>
+            <span class="font-semibold">Logout</span>
+        </a>
+    </div>
 </aside>

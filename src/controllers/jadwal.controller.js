@@ -147,6 +147,59 @@ const toggleJadwalStatus = async (req, res) => {
     }
 };
 
+// Menampilkan halaman jadwal untuk semua praktikum dalam satu lab
+const getJadwalLabPage = async (req, res) => {
+    try {
+        const labId = parseInt(req.params.lab_id, 10);
+        const user = req.session.user;
+
+        const lab = await prisma.lab.findUnique({
+            where: { id: labId },
+        });
+
+        if (!lab) {
+            return res.status(404).send('Lab tidak ditemukan');
+        }
+        
+        // Otorisasi untuk asisten
+        if (user.peran?.toLowerCase() === 'asisten') {
+            const asistenLab = await prisma.asistenLab.findFirst({
+                where: { user_id: user.id, lab_id: labId }
+            });
+
+            if (!asistenLab) {
+                return res.status(403).send('Anda tidak memiliki akses ke jadwal lab ini.');
+            }
+        }
+
+        const jadwalList = await prisma.jadwal.findMany({
+            where: {
+                praktikum: {
+                    lab_id: labId,
+                },
+            },
+            include: {
+                praktikum: {
+                    select: {
+                        nama_praktikum: true,
+                    }
+                }
+            },
+            orderBy: [{ praktikum: { nama_praktikum: 'asc' } }, { tanggal: 'asc' }],
+        });
+
+        res.render('jadwalLab', {
+            title: `Jadwal Lab - ${lab.nama_lab}`,
+            lab,
+            jadwalList,
+            user,
+        });
+    } catch (error) {
+        console.error('Error fetching lab jadwal page:', error);
+        res.status(500).send('Terjadi kesalahan pada server');
+    }
+};
+
 module.exports = {
     getJadwalPage,
     createJadwal,
@@ -154,4 +207,5 @@ module.exports = {
     updateJadwal,
     deleteJadwal,
     toggleJadwalStatus,
+    getJadwalLabPage,
 };

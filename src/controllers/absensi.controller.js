@@ -76,54 +76,56 @@ const saveAbsensi = async (req, res) => {
 };
 
 // Fungsi getDetailKehadiranPage dengan ORDER BY yang sudah diperbaiki
+
+// FUNGSI HELPER BARU
+async function getRekapKehadiranData(praktikumId) {
+    const praktikum = await prisma.praktikum.findUnique({ where: { id: praktikumId } });
+    if (!praktikum) throw new Error('Praktikum tidak ditemukan');
+
+    const mahasiswaList = await prisma.mahasiswa.findMany({
+        where: { praktikum_id: praktikumId },
+        include: { user: { select: { id: true, username: true } } },
+        orderBy: { user: { id: 'asc' } }
+    });
+
+    const jadwalList = await prisma.jadwal.findMany({
+        where: { praktikum_id: praktikumId },
+        orderBy: [{ tanggal: 'asc' }, { id: 'asc' }]
+    });
+
+    const allAbsensi = await prisma.absensi.findMany({
+        where: { jadwal: { praktikum_id: praktikumId } }
+    });
+
+    const rekapData = mahasiswaList.map(mhs => {
+        let totalHadir = 0;
+        const kehadiranPerJadwal = jadwalList.map(jadwal => {
+            const absensiRecord = allAbsensi.find(absen => 
+                absen.user_id === mhs.user_id && absen.jadwal_id === jadwal.id
+            );
+            if (absensiRecord?.status === 'Hadir') {
+                totalHadir++;
+            }
+            return absensiRecord ? absensiRecord.status : '-';
+        });
+        const totalTidakHadir = kehadiranPerJadwal.filter(status => status !== 'Hadir' && status !== '-').length;
+        return {
+            nim: mhs.user.id,
+            nama: mhs.user.username,
+            kehadiran: kehadiranPerJadwal,
+            totalHadir,
+            totalTidakHadir
+        };
+    });
+
+    return { praktikum, jadwalList, rekapData };
+}
+
+// Modifikasi getDetailKehadiranPage untuk menggunakan helper
 const getDetailKehadiranPage = async (req, res) => {
     try {
         const praktikumId = parseInt(req.params.praktikum_id, 10);
-        const praktikum = await prisma.praktikum.findUnique({ where: { id: praktikumId } });
-        if (!praktikum) return res.status(404).send('Praktikum tidak ditemukan');
-
-        const mahasiswaList = await prisma.mahasiswa.findMany({
-            where: { praktikum_id: praktikumId },
-            include: { user: { select: { id: true, username: true } } },
-            orderBy: { user: { id: 'asc' } }
-        });
-
-        // =======================================================
-        // #### PERUBAHAN LOGIKA PENGURUTAN DI SINI ####
-        // =======================================================
-        const jadwalList = await prisma.jadwal.findMany({
-            where: { praktikum_id: praktikumId },
-            orderBy: [
-                { dibuat_pada: 'asc' }, // Urutkan berdasarkan kapan jadwal dibuat
-                { id: 'asc' }          // Pengurutan kedua sebagai cadangan
-            ]
-        });
-
-        const allAbsensi = await prisma.absensi.findMany({
-            where: { jadwal: { praktikum_id: praktikumId } }
-        });
-
-        const rekapData = mahasiswaList.map(mhs => {
-            let totalHadir = 0;
-            const kehadiranPerJadwal = jadwalList.map(jadwal => {
-                const absensiRecord = allAbsensi.find(absen => 
-                    absen.user_id === mhs.user_id && absen.jadwal_id === jadwal.id
-                );
-                if (absensiRecord?.status === 'Hadir') {
-                    totalHadir++;
-                }
-                return absensiRecord ? absensiRecord.status : '-';
-            });
-            const totalTidakHadir = kehadiranPerJadwal.filter(status => status !== 'Hadir' && status !== '-').length;
-
-            return {
-                nim: mhs.user.id,
-                nama: mhs.user.username,
-                kehadiran: kehadiranPerJadwal,
-                totalHadir,
-                totalTidakHadir
-            };
-        });
+        const { praktikum, jadwalList, rekapData } = await getRekapKehadiranData(praktikumId);
 
         res.render('detailKehadiran', {
             title: `Detail Kehadiran - ${praktikum.nama_praktikum}`,
@@ -133,13 +135,15 @@ const getDetailKehadiranPage = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching detail kehadiran:", error);
-        res.status(500).send('Terjadi kesalahan pada server');
+        res.status(500).send(error.message || 'Terjadi kesalahan pada server');
     }
 };
 
+// ... (fungsi getAbsensiPage dan saveAbsensi tetap sama) ...
 
 module.exports = { 
     getAbsensiPage, 
     saveAbsensi, 
-    getDetailKehadiranPage 
+    getDetailKehadiranPage,
+    getRekapKehadiranData // Ekspor helper agar bisa digunakan controller lain
 };

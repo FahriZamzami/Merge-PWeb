@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= title %></title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-emerald-50 min-h-screen">
+<div class="flex min-h-screen">
+    
+    <!-- 
+        [FIX] Cara include sidebar diperbaiki.
+        Sekarang semua variabel (praktikum, user, currentPage, dan currentPath dari middleware)
+        akan diteruskan dengan benar ke partial sidebar.
+    -->
+    <%- include('partials/sidebarMahasiswa', { praktikum, user, currentPage }) %>
+
+    <main class="flex-1 p-6 lg:p-8 max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="mb-8 text-center lg:text-left">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mb-4 lg:mb-6">
+                <i class="fas fa-tasks text-white text-2xl"></i>
+            </div>
+            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-3">Tugas Praktikum</h1>
+            <p class="text-xl text-gray-600 mb-2"><%= praktikum.nama_praktikum %></p>
+            <div class="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-500 mx-auto lg:mx-0 rounded-full"></div>
+        </div>
+
+        <!-- ... (Sisa kode Anda sama persis dan sudah benar) ... -->
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6 card-hover border-l-4 border-green-500">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-100 rounded-full"><i class="fas fa-check-circle text-green-600 text-xl"></i></div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Sudah dikumpul</p>
+                        <p class="text-2xl font-bold text-gray-900"><%= submittedCount %></p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6 card-hover border-l-4 border-red-500">
+                <div class="flex items-center">
+                    <div class="p-3 bg-red-100 rounded-full"><i class="fas fa-clock text-red-600 text-xl"></i></div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Belum dikumpul</p>
+                        <p class="text-2xl font-bold text-gray-900"><%= pendingCount %></p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6 card-hover border-l-4 border-blue-500">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-full"><i class="fas fa-star text-blue-600 text-xl"></i></div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Rata-rata Nilai</p>
+                        <p class="text-2xl font-bold text-gray-900"><%= averageScore %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tugas Content -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="gradient-bg px-8 py-6">
+                <h2 class="text-2xl font-bold text-white">📝 Daftar Tugas</h2>
+            </div>
+            <div class="p-8">
+            <% if (daftarTugas.length > 0) { %>
+                <div class="space-y-6">
+                <% daftarTugas.forEach((tugas) => { %>
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl shadow-lg overflow-hidden card-hover border border-green-100">
+                        <div class="p-6">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-file-alt text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-gray-900"><%= tugas.judul %></h3>
+                                        <p class="text-gray-600 text-sm">Batas waktu: <%= tugas.batas_waktu_formatted %></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3 self-end sm:self-center">
+                                    <% 
+                                        let badgeClass = 'bg-red-100 text-red-800'; // Default untuk 'Belum dikumpul'
+                                        if (tugas.status.startsWith('Dinilai')) {
+                                            badgeClass = 'bg-blue-100 text-blue-800'; // Biru untuk yang sudah dinilai
+                                        } else if (tugas.status === 'Belum dinilai') {
+                                            badgeClass = 'bg-yellow-100 text-yellow-800'; // Kuning untuk yang belum dinilai
+                                        }
+                                    %>
+                                    <span class="<%= badgeClass %> text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                        <%= tugas.status %>
+                                    </span>
+                                    <a href="/assignments/<%= tugas.id %>/detail" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+                                        <i class="fas fa-eye mr-2"></i>Lihat Detail
+                                    </a>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-4"><%= tugas.deskripsi %></p>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span>Dibuat: <%= new Date(tugas.dibuat_pada).toLocaleDateString('id-ID') %></span>
+                                <span>
+                                    Status Penugasan: 
+                                    <% if (tugas.status === 'open') { %>
+                                        <span class="bg-green-100 text-green-800 text-xs font-semibold ml-1 px-2.5 py-0.5 rounded-full">Buka</span>
+                                    <% } else { %>
+                                        <span class="bg-red-100 text-red-800 text-xs font-semibold ml-1 px-2.5 py-0.5 rounded-full">Tutup</span>
+                                    <% } %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-16">
+                    <h3 class="text-2xl font-bold text-gray-900">Belum Ada Tugas</h3>
+                    <p class="text-gray-600 text-lg">Tugas praktikum untuk kelas ini belum diberikan.</p>
+                </div>
+            <% } %>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

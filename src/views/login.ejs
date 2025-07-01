@@ -12,6 +12,9 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+        .popup-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -23,7 +26,7 @@
                     <a href="/register" class="text-xl font-medium text-white/70 pb-2">Sign Up</a>
                 </div>
 
-                <form action="/login" method="POST">
+                <form id="loginForm" action="/login" method="POST">
                     <div class="mb-6">
                         <label for="id" class="block text-sm font-bold text-white mb-2">ID</label>
                         <input type="text" id="id" name="id" class="w-full px-5 py-4 bg-white/100 rounded-xl shadow-inner focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900" required>
@@ -56,34 +59,74 @@
         </div>
 
         <div class="hidden lg:flex w-3/5 bg-white flex-col justify-center items-center p-12 text-center">
-            <!-- <div class="w-full max-w-sm">
-            <div class="text-6xl font-bold text-gray-800 tracking-widest relative inline-block py-4">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gray-800"></div>
-                LABCORNER
-                <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-800"></div>
-            </div>
-        </div> -->
-            
             <img src="/assets/image/login-image.png" alt="Illustration" class="w-full max-w-lg mx-auto">
-            
-            <p class="text-lg text-gray-600 mt-8">"Satu pintu untuk semua kebutuhan praktikum Anda"</p>
+        </div>
+    </div>
+
+    <div id="errorPopup" class="fixed inset-0 popup-backdrop justify-center items-center flex hidden">
+        <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-sm">
+            <h2 class="text-2xl font-bold mb-4 text-red-600">Login Gagal</h2>
+            <p class="text-gray-700 mb-6">ID atau password yang Anda masukkan salah. Silakan coba lagi.</p>
+            <button id="closePopup" class="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2">
+                Tutup
+            </button>
         </div>
     </div>
 
     <script>
         const togglePassword = document.getElementById('togglePassword');
-        const password = document.getElementById('password');
+        const passwordInput = document.getElementById('password'); // Mengganti nama variabel agar tidak bentrok
         const eyeIcon = document.getElementById('eye-icon');
         const eyeOffIcon = document.getElementById('eye-off-icon');
 
         togglePassword.addEventListener('click', function (e) {
-            // Ganti tipe input
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            
-            // Ganti ikon
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
             eyeIcon.classList.toggle('hidden');
             eyeOffIcon.classList.toggle('hidden');
+        });
+
+        const loginForm = document.getElementById('loginForm');
+        const errorPopup = document.getElementById('errorPopup');
+        const closePopup = document.getElementById('closePopup');
+
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Mencegah form submit secara tradisional
+
+            const id = document.getElementById('id').value;
+            const kata_sandi = passwordInput.value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id, kata_sandi })
+                });
+
+                // Jika login gagal (status 401, 403, dll), tampilkan popup
+                if (!response.ok) {
+                    errorPopup.classList.remove('hidden');
+                    return; // Hentikan eksekusi lebih lanjut
+                }
+
+                // Jika server merespons dengan redirect, browser akan mengikutinya secara otomatis.
+                // Jika tidak, kita bisa arahkan secara manual.
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+
+            } catch (error) {
+                console.error('Error saat mencoba login:', error);
+                // Tampilkan popup jika terjadi error jaringan atau server tidak merespons
+                errorPopup.classList.remove('hidden');
+            }
+        });
+
+        closePopup.addEventListener('click', function() {
+            // Sembunyikan popup saat tombol 'Tutup' diklik
+            errorPopup.classList.add('hidden');
         });
     </script>
 </body>

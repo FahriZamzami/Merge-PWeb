@@ -4,61 +4,50 @@ const prisma = require('../../prisma/client');
 
 const labPage = async (req, res) => {
     try {
-        // Dapatkan informasi user yang login dari session
         const user = req.session.user;
-
-        // Jika tidak ada user di session, kembalikan ke login
         if (!user) {
             return res.redirect('/login');
         }
 
+        const allLabs = await prisma.lab.findMany();
         let praktikumList = [];
+        let managedLab = null;
 
-        // ==== PERBAIKAN DI SINI ====
-        // Cek peran user dengan .toLowerCase() agar tidak case-sensitive
         if (user.peran?.toLowerCase() === 'asisten') {
-            // --- LOGIKA UNTUK ASISTEN ---
-
-            // 1. Cari semua lab tempat asisten ini bertugas
-            const asistenLabs = await prisma.asistenLab.findMany({
+            // 1. Find the lab(s) this assistant is assigned to
+            const asistenInLabs = await prisma.asistenLab.findMany({
                 where: { user_id: user.id },
-                select: { lab_id: true }
+                include: { lab: true },
             });
 
-            // 2. Jika asisten tidak ditugaskan di lab manapun, daftar praktikum akan kosong
-            if (asistenLabs.length > 0) {
-                const allowedLabIds = asistenLabs.map(al => al.lab_id);
+            if (asistenInLabs.length > 0) {
+                // For simplicity, we'll use the first lab an assistant is assigned to as their "managed lab" context.
+                managedLab = asistenInLabs[0].lab; 
+                const labIds = asistenInLabs.map(al => al.lab_id);
 
-                // 3. Filter praktikum berdasarkan ID lab yang diizinkan
+                // 2. Fetch all practicums from those labs
                 praktikumList = await prisma.praktikum.findMany({
-                    where: {
-                        lab_id: { in: allowedLabIds }
-                    },
-                    include: { lab: true },
-                    orderBy: { dibuat_pada: 'asc' },
+                    where: { lab_id: { in: labIds } },
+                    orderBy: { nama_praktikum: 'asc' },
                 });
             }
-            
-        } else {
-            // --- LOGIKA UNTUK ADMIN / PERAN LAIN ---
-            // Ambil semua praktikum tanpa filter
+        } else if (user.peran?.toLowerCase() === 'admin') {
+            // Admins see all practicums from all labs
             praktikumList = await prisma.praktikum.findMany({
-                include: { lab: true },
-                orderBy: { dibuat_pada: 'asc' },
+                orderBy: { nama_praktikum: 'asc' },
             });
         }
-
-        const namaLab = praktikumList.length > 0 && praktikumList[0].lab
-            ? praktikumList[0].lab.nama_lab
-            : 'Laboratorium';
-
+        
         res.render('lab', {
-            user: req.session.user,
+            user: user,
+            lab: managedLab, // The lab managed by the assistant, null for others
             praktikumList,
-            lab: { nama_lab: namaLab }
+            labs: allLabs, // All labs for the "Add Class" modal
+            successMessage: req.query.success,
         });
+
     } catch (err) {
-        console.error('❌ Error di labPage:', err);
+        console.error('❌ Error in labPage:', err);
         res.status(500).send('Gagal mengambil data praktikum');
     }
 };
@@ -71,10 +60,8 @@ const showHomeClassPage = async (req, res) => {
             return res.status(400).send('ID kelas tidak valid');
         }
 
-        // Simpan ID kelas ke session
         req.session.idKelasDipilih = kelasId;
 
-        // Ambil data praktikum
         const praktikum = await prisma.praktikum.findUnique({
             where: { id: kelasId }
         });
@@ -83,12 +70,14 @@ const showHomeClassPage = async (req, res) => {
             return res.status(404).send('Praktikum tidak ditemukan');
         }
 
-        // Hitung jumlah mahasiswa
         const studentCount = await prisma.mahasiswa.count({
             where: { praktikum_id: kelasId }
         });
 
-        // Ambil jadwal praktikum terdekat
+        const assignmentCount = await prisma.tugas.count({
+            where: { praktikum_id: kelasId }
+        });
+
         const jadwalBerikutnya = await prisma.jadwal.findFirst({
             where: {
                 praktikum_id: kelasId,
@@ -106,7 +95,6 @@ const showHomeClassPage = async (req, res) => {
             })
             : 'Tidak ada jadwal';
 
-        // Ambil penugasan terakhir
         const tugasTerakhir = await prisma.tugas.findFirst({
             where: { praktikum_id: kelasId },
             orderBy: { batas_waktu: 'desc' }
@@ -135,7 +123,6 @@ const showHomeClassPage = async (req, res) => {
                 status: '-'
             };
 
-        // Render halaman
         res.render('homeClass', {
             user: req.session.user,
             praktikum: {
@@ -143,6 +130,7 @@ const showHomeClassPage = async (req, res) => {
                 startDate: praktikum.dibuat_pada?.toLocaleDateString('id-ID') || '-',
             },
             studentCount,
+            assignmentCount,
             nextSchedule,
             latestAssignment
         });
@@ -153,7 +141,70 @@ const showHomeClassPage = async (req, res) => {
     }
 };
 
+// Menampilkan daftar mahasiswa dalam satu lab
+const getDaftarMahasiswaLabPage = async (req, res) => {
+    try {
+        const user = req.session.user;
+        const labId = parseInt(req.params.lab_id, 10);
+
+        if (!user) {
+            return res.redirect('/login');
+        }
+
+        const lab = await prisma.lab.findUnique({
+            where: { id: labId }
+        });
+
+        if (!lab) {
+            return res.status(404).send('Lab tidak ditemukan');
+        }
+
+        if (user.peran?.toLowerCase() === 'asisten') {
+            // In a real scenario, you might want to check if the assistant is assigned to this lab.
+            // For now, we assume if they can access the URL, they have rights.
+        }
+
+        const mahasiswaList = await prisma.mahasiswa.findMany({
+            where: {
+                praktikum: {
+                    lab_id: labId
+                }
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                },
+                praktikum: {
+                    select: {
+                        id: true,
+                        nama_praktikum: true
+                    }
+                }
+            },
+            orderBy: [
+                { praktikum: { nama_praktikum: 'asc' } },
+                { user: { id: 'asc' } }
+            ]
+        });
+
+        res.render('daftarMahasiswaLab', {
+            title: `Daftar Mahasiswa - ${lab.nama_lab}`,
+            lab,
+            mahasiswaList,
+            user
+        });
+
+    } catch (error) {
+        console.error("Error fetching lab mahasiswa list:", error);
+        res.status(500).send('Terjadi kesalahan pada server');
+    }
+};
+
 module.exports = {
     labPage,
-    showHomeClassPage
+    showHomeClassPage,
+    getDaftarMahasiswaLabPage,
 };

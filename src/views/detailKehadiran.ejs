@@ -12,10 +12,21 @@
         <%- include('partials/sidebar', { currentPath: currentPath, praktikum: praktikum }) %>
 
         <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
-            <header class="mb-8">
+            
+            <header class="flex flex-wrap gap-4 justify-between items-center mb-8">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-800">Detail Kehadiran</h1>
-                    <p class="text-gray-500">Praktikum <%= praktikum.nama_praktikum %></p>
+                    <p class="text-gray-500">Praktikum: <%= praktikum.nama_praktikum %></p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="/praktikum/<%= praktikum.id %>/kehadiran/pdf" target="_blank" class="inline-flex items-center gap-2 bg-red-100 text-red-700 font-semibold px-4 py-2 text-sm rounded-lg hover:bg-red-200 transition">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>Ekspor PDF</span>
+                    </a>
+                    <a href="/praktikum/<%= praktikum.id %>/kehadiran/excel" class="inline-flex items-center gap-2 bg-green-100 text-green-700 font-semibold px-4 py-2 text-sm rounded-lg hover:bg-green-200 transition">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Ekspor Excel</span>
+                    </a>
                 </div>
             </header>
 
@@ -25,13 +36,9 @@
                         <tr class="border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             <th class="px-5 py-3">NIM</th>
                             <th class="px-5 py-3">Nama Mahasiswa</th>
-                            
-                            <!-- #### PERBAIKAN HEADER KOLOM DI SINI #### -->
                             <% jadwalList.forEach((jadwal) => { %>
-                                <!-- Menggunakan jadwal.id untuk nama kolom sesuai permintaan -->
-                                <th class="px-5 py-3 text-center">Pertemuan <%= jadwal.id %></th>
+                                <th class="px-5 py-3 text-center"><%= jadwal.materi %></th>
                             <% }) %>
-                            
                             <th class="px-5 py-3 text-center bg-green-100">Total Hadir</th>
                             <th class="px-5 py-3 text-center bg-red-100">Total Tdk Hadir</th>
                         </tr>
@@ -45,11 +52,11 @@
                                     <% mhs.kehadiran.forEach(status => { %>
                                         <td class="px-5 py-4 text-sm text-center">
                                             <% if (status === 'Hadir') { %>
-                                                <span class="text-green-600"><i class="fa-solid fa-circle-check"></i></span>
-                                            <% } else if (status === 'Tidak_Hadir') { %>
-                                                <span class="text-red-600"><i class="fa-solid fa-circle-xmark"></i></span>
+                                                <span style="color: green;">✓</span>
+                                            <% } else if (status === '-') { %>
+                                                -
                                             <% } else { %>
-                                                <span class="text-gray-400"><%= status %></span>
+                                                <span style="color: red;">✗</span>
                                             <% } %>
                                         </td>
                                     <% }) %>
@@ -58,7 +65,7 @@
                                 </tr>
                             <% }) %>
                         <% } else { %>
-                            <tr><td colspan="<%= 4 + jadwalList.length %>" class="text-center py-10 text-gray-500">Belum ada mahasiswa yang terdaftar.</td></tr>
+                            <tr><td colspan="<%= 4 + jadwalList.length %>" class="text-center py-10 text-gray-500">Belum ada mahasiswa untuk direkap.</td></tr>
                         <% } %>
                     </tbody>
                 </table>

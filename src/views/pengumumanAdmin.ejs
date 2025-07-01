@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buat Pengumuman - LabCorner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .bg-gradient-animated {
+      background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .theme-lea { --accent-color: #60a5fa; --accent-bg: rgba(59, 130, 246, 0.1); --accent-text: #2563eb; }
+    .theme-labgis { --accent-color: #4ade80; --accent-bg: rgba(34, 197, 94, 0.1); --accent-text: #16a34a; }
+    .theme-lbi { --accent-color: #f472b6; --accent-bg: rgba(236, 72, 153, 0.1); --accent-text: #db2777; }
+    .theme-ldkom { --accent-color: #fbbf24; --accent-bg: rgba(245, 158, 11, 0.1); --accent-text: #d97706; }
+    .theme-general { --accent-color: #8b5cf6; --accent-bg: rgba(139, 92, 246, 0.1); --accent-text: #7c3aed; }
+
+    .form-input {
+      @apply w-full bg-white/90 backdrop-blur-sm text-slate-800 placeholder-slate-400 px-6 py-4 rounded-2xl border-2 border-slate-200 focus:ring-4 focus:outline-none transition-all duration-300 text-lg shadow-lg;
+    }
+    .form-input:focus {
+      border-color: var(--accent-color);
+      background-color: white;
+      box-shadow: 0 0 0 4px var(--accent-bg);
+    }
+    
+    .bg-dots {
+      background-image: radial-gradient(circle, #d1d5db 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    
+    .typing-animation {
+      border-right: 2px solid var(--accent-color);
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 50% { border-color: transparent; }
+      51%, 100% { border-color: var(--accent-color); }
+    }
+    
+    .floating-elements {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .pulse-glow {
+      animation: pulse-glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes pulse-glow {
+      from { box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+      to { box-shadow: 0 0 40px rgba(139, 92, 246, 0.8); }
+    }
+
+    .timer-active {
+      animation: timer-pulse 1s ease-in-out infinite;
+    }
+    @keyframes timer-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 min-h-screen text-slate-800 font-[Inter] overflow-x-hidden">
+  <!-- Background Elements -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto px-6 py-8 space-y-8 z-10">
+    <!-- Header Section -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30">
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-6">
+          <a href="/" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg flex items-center gap-2">
+            <span class="text-xl">←</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="/pengumuman/list" class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg flex items-center gap-2">
+            <span class="text-xl">📋</span>
+            <span>Daftar</span>
+          </a>
+        </div>
+        
+        <!-- Timer Section -->
+        <div class="flex items-center gap-4">
+          <div id="timerDisplay" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-2xl shadow-lg font-mono text-lg font-bold hidden">
+            <span id="timerText">00:00</span>
+          </div>
+          <button id="timerToggle" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold px-4 py-3 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">
+            ⏰ Timer
+          </button>
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <h2 class="text-7xl font-black text-slate-900 drop-shadow-sm bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">📣 Creator Studio</h2>
+        <p class="text-slate-600 text-xl">Rancang pengumuman yang menarik dan informatif dengan timer otomatis</p>
+      </div>
+    </div>
+
+    <!-- Timer Modal -->
+    <div id="timerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">⏰ Set Timer Publikasi</h3>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Waktu Publikasi</label>
+            <input type="datetime-local" id="publishTime" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <button id="setTimerBtn" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-4 py-3 rounded-xl shadow-lg transition-all transform hover:scale-105">
+              Set Timer
+            </button>
+            <button id="cancelTimerBtn" class="bg-gray-500 text-white font-bold px-4 py-3 rounded-xl shadow-lg transition-all transform hover:scale-105">
+              Batal
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Left Column - Form -->
+      <div class="space-y-6">
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30">
+          <h3 class="text-3xl font-black text-slate-900 mb-6">✍️ Form Pengumuman</h3>
+          <form id="formPengumuman" class="space-y-6">
+            <div>
+              <label for="judul" class="block text-xl font-bold mb-3 text-slate-700">📝 Judul Pengumuman</label>
+              <input type="text" id="judul" name="judul" placeholder="Contoh: Perpanjangan Deadline Tugas LEA" class="form-input" required />
+              <div class="text-right text-sm text-slate-500 mt-2">
+                <span id="titleCharCount">0</span> / 100 karakter
+              </div>
+            </div>
+            
+            <div>
+              <label for="isi" class="block text-xl font-bold mb-3 text-slate-700">📄 Isi Pengumuman</label>
+              <textarea id="isi" name="isi" rows="10" placeholder="Tulis isi pengumuman secara detail dan informatif..." class="form-input resize-none" required></textarea>
+              <div class="flex justify-between text-sm text-slate-500 mt-2">
+                <span id="charCount">0</span> / 1000 karakter
+                <span id="wordCount">0 kata</span>
+              </div>
+            </div>
+            
+            <div>
+              <label for="lab_tujuan" class="block text-xl font-bold mb-3 text-slate-700">🏢 Lab Tujuan</label>
+              <select id="lab_tujuan" name="lab_tujuan" class="form-input" required>
+                <option value="">-- Pilih Lab & Tema --</option>
+                <option value="semua">🌐 Semua Lab (Umum)</option>
+                <option value="lea">LEA - Enterprise Application</option>
+                <option value="labgis">LABGIS - GIS & Mapping</option>
+                <option value="lbi">LBI - Business Intelligence</option>
+                <option value="ldkom">LDKOM - Dasar Komputasi</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="prioritas" class="block text-xl font-bold mb-3 text-slate-700">🎯 Prioritas</label>
+              <div class="grid grid-cols-3 gap-4">
+                <label class="priority-option cursor-pointer">
+                  <input type="radio" name="prioritas" value="rendah" class="hidden" />
+                  <div class="p-4 bg-green-50 border-2 border-green-200 rounded-2xl text-center transition-all hover:scale-105">
+                    <div class="text-2xl mb-2">🟢</div>
+                    <div class="font-bold text-green-700">Rendah</div>
+                  </div>
+                </label>
+                <label class="priority-option cursor-pointer">
+                  <input type="radio" name="prioritas" value="sedang" class="hidden" checked />
+                  <div class="p-4 bg-yellow-50 border-2 border-yellow-200 rounded-2xl text-center transition-all hover:scale-105">
+                    <div class="text-2xl mb-2">🟡</div>
+                    <div class="font-bold text-yellow-700">Sedang</div>
+                  </div>
+                </label>
+                <label class="priority-option cursor-pointer">
+                  <input type="radio" name="prioritas" value="tinggi" class="hidden" />
+                  <div class="p-4 bg-red-50 border-2 border-red-200 rounded-2xl text-center transition-all hover:scale-105">
+                    <div class="text-2xl mb-2">🔴</div>
+                    <div class="font-bold text-red-700">Tinggi</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30">
+          <h3 class="text-2xl font-black text-slate-900 mb-4">⚡ Aksi Cepat</h3>
+          <div class="space-y-4">
+            <button id="clearBtn" class="w-full bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold px-6 py-4 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">
+              🗑️ Bersihkan Form
+            </button>
+            <button id="saveDraftBtn" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold px-6 py-4 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">
+              💾 Simpan Draft
+            </button>
+            <button type="submit" form="formPengumuman" id="submitBtn" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold px-6 py-4 rounded-2xl shadow-2xl transition-all transform hover:scale-105 active:scale-95 text-xl disabled:opacity-50 disabled:cursor-not-allowed pulse-glow">
+              🚀 Publikasikan Pengumuman
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column - Preview -->
+      <div class="space-y-6">
+        <div>
+          <div id="previewCard" class="w-full bg-white/90 backdrop-blur-xl border-2 rounded-3xl shadow-2xl transition-all duration-500 transform-gpu overflow-hidden" style="border-color: var(--accent-color); box-shadow: 0 0 40px -10px var(--accent-bg);">
+            
+            <header class="p-6 flex items-center gap-4 bg-gradient-to-r from-white/80 to-white/60 border-b-2" style="border-color: var(--accent-color);">
+              <div id="previewIcon" class="text-5xl transition-all duration-500 transform group-hover:scale-110 floating-elements">📢</div>
+              <div class="flex-1">
+                <h3 id="previewLab" class="text-2xl font-black transition-colors duration-500" style="color: var(--accent-text);">Pengumuman</h3>
+                <p class="text-sm text-slate-500">Oleh: <span class="font-bold">Admin</span> - <span id="previewTimestamp"></span></p>
+              </div>
+              <div id="priorityBadge" class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-bold">
+                🟡 Sedang
+              </div>
+            </header>
+            
+            <main class="p-6">
+              <h4 id="previewJudul" class="text-3xl font-black text-slate-900 mb-4 min-h-[40px] leading-tight">Judul Anda</h4>
+              <p id="previewIsi" class="text-slate-600 whitespace-pre-wrap min-h-[200px] text-lg leading-relaxed">Isi pengumuman akan muncul di sini...</p>
+            </main>
+            
+            <footer class="p-4 bg-slate-50/80 border-t-2 border-slate-100">
+              <div class="flex items-center justify-between text-sm text-slate-500">
+                <span>📊 0 kali dibaca</span>
+                <span>💬 0 komentar</span>
+                <span>👍 0 suka</span>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-4 right-4 z-50 hidden">
+    <div class="bg-white border-l-4 border-green-500 shadow-lg rounded-lg p-4 max-w-sm">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let timerInterval = null;
+    let publishTime = null;
+    let isTimerActive = false;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeForm();
+      initializeTimer();
+      updatePreview();
+      updateTimestamp();
+      
+      // Update timestamp every second
+      setInterval(updateTimestamp, 1000);
+    });
+
+    function initializeForm() {
+      const form = document.getElementById('formPengumuman');
+      const judul = document.getElementById('judul');
+      const isi = document.getElementById('isi');
+      const labTujuan = document.getElementById('lab_tujuan');
+      const priorityOptions = document.querySelectorAll('.priority-option input');
+      
+      // Character counters
+      judul.addEventListener('input', function() {
+        const count = this.value.length;
+        document.getElementById('titleCharCount').textContent = count;
+        updatePreview();
+      });
+      
+      isi.addEventListener('input', function() {
+        const count = this.value.length;
+        const words = this.value.trim().split(/\s+/).filter(word => word.length > 0).length;
+        document.getElementById('charCount').textContent = count;
+        document.getElementById('wordCount').textContent = words + ' kata';
+        updatePreview();
+      });
+      
+      // Lab selection
+      labTujuan.addEventListener('change', function() {
+        updatePreview();
+      });
+      
+      // Priority selection
+      priorityOptions.forEach(option => {
+        option.addEventListener('change', function() {
+          updatePreview();
+        });
+      });
+      
+      // Form submission
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        await submitForm();
+      });
+      
+      // Quick actions
+      document.getElementById('clearBtn').addEventListener('click', clearForm);
+      document.getElementById('saveDraftBtn').addEventListener('click', saveDraft);
+    }
+
+    function initializeTimer() {
+      const timerToggle = document.getElementById('timerToggle');
+      const timerModal = document.getElementById('timerModal');
+      const setTimerBtn = document.getElementById('setTimerBtn');
+      const cancelTimerBtn = document.getElementById('cancelTimerBtn');
+      
+      timerToggle.addEventListener('click', function() {
+        if (isTimerActive) {
+          clearTimer();
+        } else {
+          timerModal.classList.remove('hidden');
+        }
+      });
+      
+      setTimerBtn.addEventListener('click', function() {
+        const publishTimeInput = document.getElementById('publishTime');
+        if (publishTimeInput.value) {
+          setTimer(new Date(publishTimeInput.value));
+          timerModal.classList.add('hidden');
+        } else {
+          showToast('Pilih waktu publikasi terlebih dahulu', 'error');
+        }
+      });
+      
+      cancelTimerBtn.addEventListener('click', function() {
+        timerModal.classList.add('hidden');
+      });
+      
+      // Close modal when clicking outside
+      timerModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+          timerModal.classList.add('hidden');
+        }
+      });
+    }
+
+    function setTimer(targetTime) {
+      publishTime = targetTime;
+      isTimerActive = true;
+      
+      const timerDisplay = document.getElementById('timerDisplay');
+      const timerToggle = document.getElementById('timerToggle');
+      
+      timerDisplay.classList.remove('hidden');
+      timerToggle.classList.add('timer-active');
+      timerToggle.textContent = '⏰ Timer Aktif';
+      
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 1000);
+      
+      showToast('Timer publikasi telah diatur!', 'success');
+    }
+
+    function clearTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      
+      isTimerActive = false;
+      publishTime = null;
+      
+      const timerDisplay = document.getElementById('timerDisplay');
+      const timerToggle = document.getElementById('timerToggle');
+      
+      timerDisplay.classList.add('hidden');
+      timerToggle.classList.remove('timer-active');
+      timerToggle.textContent = '⏰ Timer';
+      
+      showToast('Timer telah dibatalkan', 'info');
+    }
+
+    function updateTimer() {
+      if (!publishTime) return;
+      
+      const now = new Date();
+      const diff = publishTime - now;
+      
+      if (diff <= 0) {
+        // Timer expired, auto publish
+        clearTimer();
+        submitForm();
+        return;
+      }
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      const timerText = document.getElementById('timerText');
+      timerText.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function updatePreview() {
+      const judul = document.getElementById('judul').value;
+      const isi = document.getElementById('isi').value;
+      const labTujuan = document.getElementById('lab_tujuan').value;
+      const selectedPriority = document.querySelector('input[name="prioritas"]:checked').value;
+      
+      // Update preview content
+      document.getElementById('previewJudul').textContent = judul || 'Judul Anda';
+      document.getElementById('previewIsi').textContent = isi || 'Isi pengumuman akan muncul di sini...';
+      
+      // Update lab theme
+      const previewCard = document.getElementById('previewCard');
+      const previewIcon = document.getElementById('previewIcon');
+      const previewLab = document.getElementById('previewLab');
+      
+      previewCard.className = 'w-full bg-white/90 backdrop-blur-xl border-2 rounded-3xl shadow-2xl transition-all duration-500 transform-gpu overflow-hidden';
+      
+      if (labTujuan === 'lea') {
+        previewCard.classList.add('theme-lea');
+        previewIcon.textContent = '💼';
+        previewLab.textContent = 'LEA';
+      } else if (labTujuan === 'labgis') {
+        previewCard.classList.add('theme-labgis');
+        previewIcon.textContent = '🗺️';
+        previewLab.textContent = 'LABGIS';
+      } else if (labTujuan === 'lbi') {
+        previewCard.classList.add('theme-lbi');
+        previewIcon.textContent = '📊';
+        previewLab.textContent = 'LBI';
+      } else if (labTujuan === 'ldkom') {
+        previewCard.classList.add('theme-ldkom');
+        previewIcon.textContent = '💻';
+        previewLab.textContent = 'LDKOM';
+      } else if (labTujuan === 'semua') {
+        previewCard.classList.add('theme-general');
+        previewIcon.textContent = '🌐';
+        previewLab.textContent = 'Semua Lab';
+      } else {
+        previewIcon.textContent = '📢';
+        previewLab.textContent = 'Pengumuman';
+      }
+      
+      // Update priority badge
+      const priorityBadge = document.getElementById('priorityBadge');
+      if (selectedPriority === 'rendah') {
+        priorityBadge.className = 'px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold';
+        priorityBadge.textContent = '🟢 Rendah';
+      } else if (selectedPriority === 'sedang') {
+        priorityBadge.className = 'px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-bold';
+        priorityBadge.textContent = '🟡 Sedang';
+      } else if (selectedPriority === 'tinggi') {
+        priorityBadge.className = 'px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-bold';
+        priorityBadge.textContent = '🔴 Tinggi';
+      }
+    }
+
+    function updateTimestamp() {
+      const now = new Date();
+      const timestamp = now.toLocaleString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      document.getElementById('previewTimestamp').textContent = timestamp;
+    }
+
+    async function submitForm() {
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = '🔄 Memproses...';
+      try {
+        const formData = new FormData(document.getElementById('formPengumuman'));
+        const data = {
+          judul: formData.get('judul'),
+          isi: formData.get('isi')
+        };
+        const response = await fetch('/pengumuman', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.success) {
+          showToast('Pengumuman berhasil dipublikasikan!', 'success');
+          clearForm();
+          if (isTimerActive) {
+            clearTimer();
+          }
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        showToast('Gagal mempublikasikan pengumuman: ' + error.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🚀 Publikasikan Pengumuman';
+      }
+    }
+
+    function clearForm() {
+      document.getElementById('formPengumuman').reset();
+      document.getElementById('titleCharCount').textContent = '0';
+      document.getElementById('charCount').textContent = '0';
+      document.getElementById('wordCount').textContent = '0 kata';
+      updatePreview();
+      showToast('Form telah dibersihkan', 'info');
+    }
+
+    function saveDraft() {
+      const formData = {
+        judul: document.getElementById('judul').value,
+        isi: document.getElementById('isi').value,
+        lab_tujuan: document.getElementById('lab_tujuan').value,
+        prioritas: document.querySelector('input[name="prioritas"]:checked').value,
+        timestamp: new Date().toISOString()
+      };
+      
+      localStorage.setItem('announcementDraft', JSON.stringify(formData));
+      showToast('Draft berhasil disimpan!', 'success');
+    }
+
+    function loadDraft() {
+      const draft = localStorage.getItem('announcementDraft');
+      if (draft) {
+        const data = JSON.parse(draft);
+        document.getElementById('judul').value = data.judul || '';
+        document.getElementById('isi').value = data.isi || '';
+        document.getElementById('lab_tujuan').value = data.lab_tujuan || '';
+        
+        if (data.prioritas) {
+          document.querySelector(`input[name="prioritas"][value="${data.prioritas}"]`).checked = true;
+        }
+        
+        updatePreview();
+        showToast('Draft berhasil dimuat!', 'success');
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      
+      toastMessage.textContent = message;
+      
+      // Update toast styling based on type
+      const toastContent = toast.querySelector('div');
+      if (type === 'error') {
+        toastContent.className = 'bg-white border-l-4 border-red-500 shadow-lg rounded-lg p-4 max-w-sm';
+        toast.querySelector('svg').className = 'h-5 w-5 text-red-500';
+      } else if (type === 'info') {
+        toastContent.className = 'bg-white border-l-4 border-blue-500 shadow-lg rounded-lg p-4 max-w-sm';
+        toast.querySelector('svg').className = 'h-5 w-5 text-blue-500';
+      } else {
+        toastContent.className = 'bg-white border-l-4 border-green-500 shadow-lg rounded-lg p-4 max-w-sm';
+        toast.querySelector('svg').className = 'h-5 w-5 text-green-500';
+      }
+      
+      toast.classList.remove('hidden');
+      
+      // Hide toast after 3 seconds
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+
+    // Load draft on page load if exists
+    window.addEventListener('load', function() {
+      if (localStorage.getItem('announcementDraft')) {
+        const loadDraftBtn = document.createElement('button');
+        loadDraftBtn.textContent = '📄 Muat Draft';
+        loadDraftBtn.className = 'bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold px-4 py-2 rounded-xl shadow-lg transition-all transform hover:scale-105 text-sm';
+        loadDraftBtn.onclick = loadDraft;
+        
+        const actionsDiv = document.querySelector('.space-y-4');
+        actionsDiv.insertBefore(loadDraftBtn, actionsDiv.firstChild);
+      }
+    });
+  </script>
+</body>
+</html>

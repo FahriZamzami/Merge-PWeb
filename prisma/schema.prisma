@@ -98,7 +98,6 @@ model mahasiswa {
   waktu_daftar   DateTime?
   user           user      @relation(fields: [user_id], references: [id])
   praktikum      praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
-  praktikum      praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, praktikum_id])
 }
@@ -122,10 +121,12 @@ model modul {
   id            Int       @id @default(autoincrement())
   praktikum_id  Int
   judul         String
-  file_path     String
-  diunggah_pada DateTime  @default(now())
+  file_path     String   @unique
+  diunggah_pada DateTime @default(now())
 
   praktikum     praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
+
+  @@map("modul")
 }
 
 model tugas {
@@ -140,7 +141,6 @@ model tugas {
   tutup_penugasan  Boolean       @default(false)
 
   praktikum        praktikum     @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
-  praktikum        praktikum     @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
   pengumpulan      pengumpulan[]
 }
 
@@ -154,7 +154,6 @@ model pengumpulan {
   catatan      String?
 
   tugas        tugas     @relation(fields: [tugas_id], references: [id], onDelete: Cascade)
-  tugas        tugas     @relation(fields: [tugas_id], references: [id], onDelete: Cascade)
   user         user      @relation(fields: [user_id], references: [id])
 }
 
@@ -165,7 +164,6 @@ model pengumuman {
   dibuat_oleh  String
   dibuat_pada  DateTime?
 
-  praktikum    praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
   praktikum    praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
   pembuat      user      @relation("PengumumanPembuat", fields: [dibuat_oleh], references: [id])
 }

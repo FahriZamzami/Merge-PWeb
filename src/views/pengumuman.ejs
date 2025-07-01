@@ -10,43 +10,52 @@
         #modal-toggle:checked ~ .modal-backdrop { display: flex; }
     </style>
 </head>
-<body class="bg-purple-50">
+<body class="bg-slate-50">
     <div class="flex h-screen">
         <%- include('partials/sidebar', { currentPath: currentPath, praktikum: praktikum }) %>
 
-        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
-            <header class="flex justify-between items-center mb-8">
+        <main class="flex-1 p-6 lg:p-10 overflow-y-auto">
+            <header class="flex flex-wrap gap-4 justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-800">Pengumuman</h1>
-                    <p class="text-gray-500">Praktikum: <%= praktikum.nama_praktikum %></p>
+                    <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Pengumuman</h1>
+                    <p class="text-slate-500 mt-1">Kelas: <%= praktikum.nama_praktikum %></p>
                 </div>
-                <label for="modal-toggle" class="cursor-pointer bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition duration-300">
-                    <i class="fa-solid fa-plus mr-2"></i>Buat Pengumuman
+                <label for="modal-toggle" class="cursor-pointer inline-flex items-center gap-2 bg-purple-600 text-white font-semibold px-5 py-2.5 rounded-lg shadow-md hover:bg-purple-700 transition-colors">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Buat Pengumuman</span>
                 </label>
             </header>
 
             <div class="space-y-6">
                 <% if (pengumumanList.length > 0) { %>
                     <% pengumumanList.forEach(pengumuman => { %>
-                        <div class="bg-white rounded-lg shadow-md p-6 relative">
-                            <% if (user.id === pengumuman.dibuat_oleh || user.peran === 'admin') { %>
-                            <form action="/pengumuman/delete/<%= pengumuman.id %>" method="POST" class="delete-form absolute top-4 right-4">
-                                <button type="submit" class="text-gray-400 hover:text-red-600">
+                        <div class="bg-white rounded-2xl shadow-lg p-6 relative group">
+                             <% if (user.id === pengumuman.dibuat_oleh || user.peran === 'admin') { %>
+                            <form action="/pengumuman/delete/<%= pengumuman.id %>" method="POST" class="delete-form absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button type="submit" class="text-slate-400 hover:text-red-600 p-2 rounded-full hover:bg-slate-100">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </form>
                             <% } %>
-
-                            <p class="text-gray-700 whitespace-pre-wrap"><%= pengumuman.isi %></p>
-                            <div class="text-right text-xs text-gray-400 mt-4 border-t pt-2">
-                                Dibuat oleh <strong><%= pengumuman.pembuat.username %></strong> pada <%= new Date(pengumuman.dibuat_pada).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short'}) %>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="bg-blue-100 text-blue-500 rounded-full h-10 w-10 flex-shrink-0 flex items-center justify-center">
+                                    <i class="fa-solid fa-bullhorn"></i>
+                                </div>
+                                <div>
+                                    <p class="text-slate-700 whitespace-pre-wrap leading-relaxed"><%= pengumuman.isi %></p>
+                                    <div class="text-xs text-slate-400 mt-3 pt-3 border-t border-slate-100">
+                                        Oleh <strong><%= pengumuman.pembuat.username %></strong> &middot; <%= new Date(pengumuman.dibuat_pada).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' }) %>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     <% }) %>
                 <% } else { %>
-                    <div class="text-center py-16 bg-white rounded-lg shadow-md">
-                        <i class="fa-solid fa-bullhorn text-4xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-500">Belum ada pengumuman untuk praktikum ini.</p>
+                    <div class="text-center py-16 bg-white rounded-2xl shadow-lg">
+                        <i class="fa-solid fa-inbox text-4xl text-slate-300 mb-4"></i>
+                        <h3 class="text-lg font-medium text-slate-800">Tidak Ada Pengumuman</h3>
+                        <p class="text-slate-500 mt-1">Belum ada pengumuman yang dipublikasikan untuk kelas ini.</p>
                     </div>
                 <% } %>
             </div>
@@ -54,21 +63,21 @@
     </div>
 
     <input type="checkbox" id="modal-toggle" class="hidden">
-    <div class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg">
+    <div class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-lg">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">Buat Pengumuman Baru</h3>
-                <label for="modal-toggle" class="cursor-pointer text-2xl text-gray-500 hover:text-gray-800">&times;</label>
+                <h3 class="text-2xl font-bold text-slate-800">Buat Pengumuman Baru</h3>
+                <label for="modal-toggle" class="cursor-pointer text-2xl text-slate-400 hover:text-slate-800">&times;</label>
             </div>
-            <form action="/pengumuman/create" method="POST">
+            <form action="/praktikum/<%= praktikum.id %>/pengumuman/create" method="POST">
                 <input type="hidden" name="praktikum_id" value="<%= praktikum.id %>">
-                <div class="mb-4">
-                    <label for="isi" class="block text-sm font-medium text-gray-700 mb-1">Isi Pengumuman</label>
-                    <textarea name="isi" id="isi" rows="6" required class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ketik pengumuman Anda di sini..."></textarea>
+                <div class="mb-5">
+                    <label for="isi" class="block text-sm font-semibold text-slate-700 mb-2">Isi Pengumuman</label>
+                    <textarea name="isi" id="isi" rows="6" required class="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ketik pengumuman Anda di sini..."></textarea>
                 </div>
                 <div class="flex justify-end space-x-4">
-                    <label for="modal-toggle" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-md cursor-pointer hover:bg-gray-300">Batal</label>
-                    <button type="submit" class="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">Terbitkan</button>
+                    <label for="modal-toggle" class="px-6 py-2.5 bg-slate-200 text-slate-800 rounded-lg cursor-pointer hover:bg-slate-300 font-medium">Batal</label>
+                    <button type="submit" class="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold">Terbitkan</button>
                 </div>
             </form>
         </div>

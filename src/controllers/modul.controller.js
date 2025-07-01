@@ -183,7 +183,6 @@ const deletePengumuman = async (req, res) => {
         res.status(500).send("Gagal menghapus pengumuman.");
     }
 };
-
 // Ekspor semua fungsi controller agar bisa digunakan oleh router
 module.exports = {
     getModulPage,

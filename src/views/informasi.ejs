@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .bg-gradient-animated {
+      background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 min-h-screen text-slate-800 font-[Inter]">
+  <!-- Background Elements -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-40 left-40 w-80 h-80 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto px-6 py-8 space-y-8 z-10">
+    <!-- Header Section -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30">
+      <div class="flex items-center gap-6 mb-8">
+        <a href="/admin" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg flex items-center gap-2">
+          <span class="text-xl">←</span>
+          <span>Kembali ke Dashboard</span>
+        </a>
+      </div>
+      <div class="text-center">
+        <h2 class="text-7xl font-black text-slate-900 drop-shadow-sm bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">ℹ️ Informasi Lab</h2>
+        <p class="text-slate-600 text-xl">Informasi lengkap tentang laboratorium di LabCorner</p>
+      </div>
+    </div>
+
+    <!-- Lab Information Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <% if (labs && labs.length > 0) { %>
+        <% labs.forEach(lab => { %>
+          <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30 hover:shadow-3xl transition-all duration-300">
+            <div class="flex items-center gap-6 mb-6">
+              <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-2xl flex items-center justify-center text-4xl font-black shadow-lg">
+                🏢
+              </div>
+              <div>
+                <h3 class="text-4xl font-black text-slate-900 mb-2"><%= lab.nama_lab %></h3>
+                <p class="text-slate-600 text-lg"><%= lab.deskripsi || 'Deskripsi belum tersedia' %></p>
+              </div>
+            </div>
+            <div class="space-y-4">
+              <div class="p-4 bg-blue-50 rounded-2xl border-2 border-blue-100">
+                <p class="text-slate-700 text-lg leading-relaxed">
+                  <%= lab.deskripsi || '-' %>
+                </p>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
+                  <p class="text-slate-500 text-sm font-medium">Jadwal</p>
+                  <p class="text-slate-800 font-bold"><%= lab.jadwal || '-' %></p>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
+                  <p class="text-slate-500 text-sm font-medium">Dosen</p>
+                  <p class="text-slate-800 font-bold"><%= lab.dosen || '-' %></p>
+                </div>
+              </div>
+              <div class="mt-4">
+                <a href="/lab/<%= lab.nama_lab.toLowerCase() %>" class="inline-block bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold px-6 py-2 rounded-xl shadow hover:from-purple-600 hover:to-indigo-700 transition-all">Lihat Detail</a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="col-span-2 text-center text-xl text-slate-500 py-16">Belum ada data laboratorium.</div>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>
