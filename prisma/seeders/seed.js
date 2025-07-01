@@ -1,21 +1,15 @@
 // seeder.js
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt'); // bcrypt tidak lagi diperlukan
 
 const prisma = new PrismaClient();
 
 async function main() {
     console.log('Memulai proses seeding... 🌱');
 
-    // 1. Hash semua kata sandi yang dibutuhkan
-    const saltRounds = 10; // Standar industri untuk hashing
-    console.log('Menyiapkan dan mengenkripsi kata sandi...');
-
-    const adminPassword = await bcrypt.hash('sayasukadurian', saltRounds);
-    const mahasiswaPassword = await bcrypt.hash('password123', saltRounds); // HASHED
-    const asistenPassword = await bcrypt.hash('labkece123', saltRounds);   // HASHED
-
-    console.log('Semua kata sandi berhasil dienkripsi. ✅');
+    // 1. Kata sandi tidak lagi di-hash.
+    // Blok kode untuk hashing menggunakan bcrypt telah dihapus.
+    console.log('Menyiapkan kata sandi (plain text)... ✅');
 
     // 2. Membersihkan data lama untuk menghindari konflik
     console.log('Membersihkan data lama dari database...');
@@ -46,7 +40,7 @@ async function main() {
     });
     console.log('Tabel `Lab` berhasil di-seed.');
 
-    // Tabel User dengan kata sandi sesuai peran (SEMUA DI-HASH)
+    // Tabel User dengan kata sandi plain text sesuai peran
     const users = [
         { id: '02', username: 'della', peran: 'mahasiswa' },
         { id: '2311522031', username: 'Pablo', peran: 'mahasiswa' },
@@ -74,13 +68,13 @@ async function main() {
         let kata_sandi;
         switch (user.peran) {
             case 'admin':
-                kata_sandi = adminPassword;
+                kata_sandi = 'sayasukadurian'; // Plain text
                 break;
             case 'asisten':
-                kata_sandi = asistenPassword;
+                kata_sandi = 'labkece123'; // Plain text
                 break;
             case 'mahasiswa':
-                kata_sandi = mahasiswaPassword;
+                kata_sandi = 'password123'; // Plain text
                 break;
         }
         return { ...user, kata_sandi };
