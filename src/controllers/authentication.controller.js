@@ -1,6 +1,6 @@
 // src/controllers/authentication.controller.js
 
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt'); // bcrypt tidak lagi digunakan
 const prisma = require('../../prisma/client');
 
 const login = async (req, res) => {
@@ -12,8 +12,9 @@ const login = async (req, res) => {
             return res.status(401).send('ID atau password salah');
         }
 
-        // Always use bcrypt to compare passwords for all roles
-        const isPasswordValid = await bcrypt.compare(kata_sandi, user.kata_sandi);
+        // --- PERUBAHAN ---
+        // Bandingkan password sebagai plain text, bukan hash
+        const isPasswordValid = (kata_sandi === user.kata_sandi);
 
         if (!isPasswordValid) {
             return res.status(401).send('ID atau password salah');
