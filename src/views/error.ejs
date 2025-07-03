@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-[Inter] flex items-center justify-center p-4">
+  <div class="relative w-full max-w-2xl mx-auto z-10">
+    <div class="text-center mb-10">
+        <h2 class="text-5xl font-extrabold text-red-600 drop-shadow-sm">⚠️ Error</h2>
+        <p class="text-slate-500 mt-2 text-lg">Terjadi kesalahan pada sistem</p>
+    </div>
+    <div class="bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-8 border border-white/30 space-y-6">
+        <div class="text-center">
+            <h3 class="text-2xl font-bold text-slate-800 mb-4"><%= message %></h3>
+            <% if (error) { %>
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <p class="text-red-800 text-sm font-mono"><%= error %></p>
+                </div>
+            <% } %>
+            <div class="space-y-4">
+                <a href="/" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-300">
+                    🏠 Kembali ke Dashboard
+                </a>
+                <br>
+                <a href="/user" class="inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-300">
+                    👥 Kembali ke User
+                </a>
+            </div>
+        </div>
+    </div>
+  </div>
+</body>
+</html> 

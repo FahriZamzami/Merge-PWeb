@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tambah Kelas - LABCORNER</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-100 to-purple-300 min-h-screen flex">
+
+  <aside class="w-64 bg-purple-700 text-white p-6 rounded-r-2xl flex flex-col">
+    <h1 class="text-2xl font-bold mb-10">LABCORNER</h1>
+    <nav class="space-y-4">
+      <a href="/lab" class="flex items-center text-purple-200 hover:text-white transition-colors duration-200">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001 1h3v-9a1 1 0 00-1-1H9a1 1 0 00-1 1v9m-6 0h6"/></svg>
+        Home Lab
+      </a>
+      <a href="/kelas/tambah" class="flex items-center space-x-4 p-3 rounded-lg text-white/90 hover:bg-white/10 border-2 border-white/30">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"/></svg>
+        <span class="font-semibold">Tambah Kelas</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main class="flex-1 flex justify-center items-center p-6">
+    <form action="/kelas/create" method="POST" class="bg-white p-10 rounded-xl shadow-lg w-full max-w-xl">
+      <h2 class="text-2xl font-bold text-center mb-8">Tambah Kelas Baru</h2>
+
+      <div class="space-y-5">
+
+        <div>
+          <label class="block text-purple-600 font-semibold mb-1">Nama Praktikum</label>
+          <input type="text" name="nama_praktikum" placeholder="Contoh: Data Mining - Kelas A"
+            class="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400" required />
+        </div>
+
+        <div>
+          <label class="block text-purple-600 font-semibold mb-1">Lab</label>
+          <select name="lab_id" class="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400" required>
+            <% labs.forEach(lab => { %>
+              <option value="<%= lab.id %>"><%= lab.nama_lab %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-purple-600 font-semibold mb-1">Kode Masuk</label>
+          <input type="text" name="kode_masuk" placeholder="Masukkan kode akses"
+            class="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400" required />
+        </div>
+
+      </div>
+
+      <div class="flex justify-between mt-8">
+        <a href="/lab" class="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600">Kembali</a>
+        <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600">Simpan</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html> 

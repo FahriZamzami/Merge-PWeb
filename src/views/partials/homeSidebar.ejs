@@ -1,0 +1,39 @@
+<aside class="w-64 bg-purple-900 text-white p-6">
+    <a href="/home"><h1 class="text-3xl font-bold mb-8 text-center">LABCORNER</h1></a>
+    <ul class="space-y-4">
+        <li>
+            <a href="#" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors
+                <%= currentPath.startsWith('/modulMateri') ? 'bg-purple-700' : '' %>">
+                <i class="fas fa-book mr-3"></i>Modul Materi
+            </a>
+        </li>
+        <li>
+            <a href="#" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors
+                <%= currentPath.startsWith('/tugas') ? 'bg-purple-700' : '' %>">
+                <i class="fas fa-tasks mr-3"></i>Tugas
+            </a>
+        </li>
+        <li>
+            <a href="#" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors
+                <%= currentPath.startsWith('/jadwal') ? 'bg-purple-700' : '' %>">
+                <i class="fas fa-calendar-alt mr-3"></i>Jadwal Praktikum
+            </a>
+        </li>
+        <li>
+            <a href="#" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors
+                <%= currentPath.startsWith('/kontak') ? 'bg-purple-700' : '' %>">
+                <i class="fas fa-envelope mr-3"></i>Kontak Lab
+            </a>
+        </li>
+        <li>
+          <a href="/pilihLab" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors <%= currentPath.startsWith('/pilihLab') ? 'bg-purple-700' : '' %>">
+              <i class="fas fa-magnifying-glass-plus mr-3"></i>Cari Kelas
+          </a>
+      </li>
+        <li class="pt-4 border-t border-purple-700">
+            <a href="/logout" class="block py-3 text-lg hover:bg-purple-700 px-4 rounded-md transition-colors">
+                <i class="fas fa-sign-out-alt mr-3"></i>Logout
+            </a>
+        </li>
+    </ul>
+</aside>

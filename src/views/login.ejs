@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - LABCORNER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .popup-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="flex min-h-screen">
+        <div class="w-full lg:w-1/2 bg-gradient-to-br from-[#6D28D9] to-[#D8B4FE] flex flex-col justify-center items-center p-8 sm:p-12">
+            <div class="w-full max-w-md">
+                <div class="flex items-center space-x-8 mb-10">
+                    <a href="/login" class="text-xl font-bold text-white pb-2 border-b-4 border-white">Sign In</a>
+                    <a href="/register" class="text-xl font-medium text-white/70 pb-2">Sign Up</a>
+                </div>
+
+                <form id="loginForm" action="/login" method="POST">
+                    <div class="mb-6">
+                        <label for="id" class="block text-sm font-bold text-white mb-2">ID</label>
+                        <input type="text" id="id" name="id" class="w-full px-5 py-4 bg-white/100 rounded-xl shadow-inner focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900" required>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="password" class="block text-sm font-bold text-white mb-2">Password</label>
+                        <div class="relative">
+                            <input type="password" id="password" name="kata_sandi" class="w-full px-5 py-4 bg-white/100 rounded-xl shadow-inner focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900" required>
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600">
+                                <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <svg id="eye-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 .946-3.11 3.22-5.514 6.072-6.52M17.5 9.5A10.05 10.05 0 0121.542 12c-1.274 4.057-5.064 7-9.542 7a10.05 10.05 0 01-1.458-.175M18.5 5.5l-13 13" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-8">
+                        <a href="#" class="text-sm font-medium text-purple-200 hover:underline">Forget your password ?</a>
+                        <button type="submit" class="px-10 py-3 bg-gray-900 text-white font-semibold rounded-xl shadow-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2">
+                            Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="hidden lg:flex w-3/5 bg-white flex-col justify-center items-center p-12 text-center">
+            <img src="/assets/image/login-image.png" alt="Illustration" class="w-full max-w-lg mx-auto">
+        </div>
+    </div>
+
+    <div id="errorPopup" class="fixed inset-0 popup-backdrop justify-center items-center flex hidden">
+        <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-sm">
+            <h2 class="text-2xl font-bold mb-4 text-red-600">Login Gagal</h2>
+            <p class="text-gray-700 mb-6">ID atau password yang Anda masukkan salah. Silakan coba lagi.</p>
+            <button id="closePopup" class="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password'); // Mengganti nama variabel agar tidak bentrok
+        const eyeIcon = document.getElementById('eye-icon');
+        const eyeOffIcon = document.getElementById('eye-off-icon');
+
+        togglePassword.addEventListener('click', function (e) {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            eyeIcon.classList.toggle('hidden');
+            eyeOffIcon.classList.toggle('hidden');
+        });
+
+        const loginForm = document.getElementById('loginForm');
+        const errorPopup = document.getElementById('errorPopup');
+        const closePopup = document.getElementById('closePopup');
+
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Mencegah form submit secara tradisional
+
+            const id = document.getElementById('id').value;
+            const kata_sandi = passwordInput.value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id, kata_sandi })
+                });
+
+                // Jika login gagal (status 401, 403, dll), tampilkan popup
+                if (!response.ok) {
+                    errorPopup.classList.remove('hidden');
+                    return; // Hentikan eksekusi lebih lanjut
+                }
+
+                // Jika server merespons dengan redirect, browser akan mengikutinya secara otomatis.
+                // Jika tidak, kita bisa arahkan secara manual.
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+
+            } catch (error) {
+                console.error('Error saat mencoba login:', error);
+                // Tampilkan popup jika terjadi error jaringan atau server tidak merespons
+                errorPopup.classList.remove('hidden');
+            }
+        });
+
+        closePopup.addEventListener('click', function() {
+            // Sembunyikan popup saat tombol 'Tutup' diklik
+            errorPopup.classList.add('hidden');
+        });
+    </script>
+</body>
+</html>

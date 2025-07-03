@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Daftar Penugasan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .dropdown:focus-within .dropdown-menu {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-[#F9F5FF]">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { praktikum }) %>
+
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            <!-- <header class="flex items-center justify-between py-3 px-6 bg-white shadow-sm sticky top-0 z-20">
+                <h2 class="text-xl font-semibold text-gray-800">LABCORNER</h2>
+                <div class="flex items-center space-x-5">
+                    <img src="https://i.ibb.co/68q746Z/logo-web.png" alt="Logo" class="h-8 w-8 rounded-full">
+                    <button class="text-gray-500 relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    </button>
+                    <div class="relative">
+                        <img class="h-9 w-9 rounded-full" src="https://i.ibb.co/6n20s3v/4215763.png" alt="User profile">
+                    </div>
+                </div>
+            </header> -->
+
+            <main class="p-6 lg:p-10">
+                <div class="flex flex-wrap gap-4 justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Daftar Penugasan</h1>
+                        <p class="text-slate-500 mt-1">Kelas: <%= praktikum.nama_praktikum %></p>
+                    </div>
+                    <a href="/assignments/create" class="inline-flex items-center gap-2 bg-purple-600 text-white font-semibold px-5 py-2.5 rounded-lg shadow-md hover:bg-purple-700 transition-colors">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        <span>Buat Tugas Baru</span>
+                    </a>
+                </div>
+
+                <div class="space-y-6">
+                    <% if (assignments && assignments.length > 0) { %>
+                        <% assignments.forEach((a, index) => { 
+                            const deadline = new Date(a.batas_waktu);
+                            const hari = deadline.toLocaleDateString('id-ID', { weekday: 'long' });
+                            const tanggal = deadline.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                            const jam = deadline.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace('.', ':');
+                        %>
+                        
+                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                            <div class="p-5 flex items-start gap-5 border-l-4 <%= a.status === 'close' ? 'border-red-400' : 'border-green-400' %>">
+                                <div class="text-purple-400 mt-1 flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                    </svg>
+                                </div>
+                                <div class="flex-grow">
+                                    <a href="/penugasan/detail/<%= a.id %>" class="hover:text-purple-700 transition-colors">
+                                        <h3 class="font-bold text-lg text-gray-800 "><%= a.judul %></h3>
+                                    </a>
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        Tenggat: <%= hari %>, <%= tanggal %> - <%= jam %>
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-4 flex-shrink-0">
+                                    <span class="px-3 py-1 text-xs font-bold rounded-full
+                                        <%= a.status === 'close' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' %>">
+                                        <%= a.status === 'close' ? 'Ditutup' : 'Dibuka' %>
+                                    </span>
+
+                                    <div class="relative dropdown" onclick="event.stopPropagation()">
+                                        <button tabindex="0" class="text-gray-500 hover:text-gray-800 p-2 rounded-full hover:bg-gray-100">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                            </svg>
+                                        </button>
+                                        <ul class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white shadow-xl rounded-lg z-10 ring-1 ring-black ring-opacity-5 overflow-hidden">
+                                            <li>
+                                                <button 
+                                                    class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3 toggle-status-btn"
+                                                    data-id="<%= a.id %>">
+                                                    <% if (a.status === 'close') { %>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-10.293a1 1 0 00-1.414-1.414L9 9.586 7.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                                        <span>Buka Penugasan</span>
+                                                    <% } else { %>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
+                                                        <span>Tutup Penugasan</span>
+                                                    <% } %>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <a href="/assignments/<%= a.id %>/edit" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                                                    <span>Edit</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <button 
+                                                    class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-3"
+                                                    onclick="showDeleteModal(<%= a.id %>)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                                    <span>Hapus</span>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="text-center py-16">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">Belum ada penugasan</h3>
+                            <p class="mt-1 text-sm text-gray-500">Buat penugasan pertama Anda untuk memulai.</p>
+                            <div class="mt-6">
+                                <a href="/assignments/create" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    Tugas Baru
+                                </a>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Hapus Penugasan -->
+    <div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Penghapusan</h3>
+            <p class="text-gray-600 mb-6">Yakin ingin menghapus penugasan ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <form id="deleteForm" method="POST">
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600">Ya, Hapus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropdownToggles = document.querySelectorAll('.dropdown > button');
+            const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+            const toggleButtons = document.querySelectorAll('.toggle-status-btn');
+
+            // Buka/tutup dropdown dan tutup dropdown lain
+            dropdownToggles.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const menu = button.nextElementSibling;
+
+                    dropdownMenus.forEach(m => {
+                        if (m !== menu) m.classList.add('hidden');
+                    });
+
+                    menu.classList.toggle('hidden');
+                });
+            });
+
+            // Cegah dropdown tertutup saat klik di dalam menu
+            dropdownMenus.forEach(menu => {
+                menu.addEventListener('click', e => {
+                    e.stopPropagation();
+                });
+            });
+
+            // Tutup semua dropdown jika klik di luar
+            window.addEventListener('click', () => {
+                dropdownMenus.forEach(menu => menu.classList.add('hidden'));
+            });
+
+            // Tombol toggle status penugasan
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const id = button.dataset.id;
+
+                    try {
+                        const response = await fetch(`/assignments/${id}/toggle-status`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+
+                        if (response.ok) {
+                            location.reload(); // refresh jika sukses
+                        } else {
+                            const error = await response.json();
+                            alert('Gagal mengubah status: ' + (error.message || 'Terjadi kesalahan.'));
+                        }
+                    } catch (err) {
+                        alert('Gagal mengirim permintaan: ' + err.message);
+                    }
+                });
+            });
+        });
+
+        // Modal hapus penugasan
+        function showDeleteModal(id) {
+            const form = document.getElementById('deleteForm');
+            form.action = `/assignments/delete/${id}`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+    </script>
+
+</body>
+</html>

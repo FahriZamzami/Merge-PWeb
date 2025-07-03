@@ -1,0 +1,34 @@
+{
+    "name": "tb-project-pweb",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev": "nodemon src/index.js",
+        "start": "node src/index.js",
+        "migrate": "npx prisma migrate dev --name init",
+        "seed": "node prisma/seeders/seed.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@prisma/client": "^6.10.1",
+        "bcrypt": "^6.0.0",
+        "ejs": "^3.1.10",
+        "exceljs": "^4.4.0",
+        "express": "^5.1.0",
+        "express-ejs-layouts": "^2.5.1",
+        "express-session": "^1.18.1",
+        "multer": "^2.0.1",
+        "mysql2": "^3.14.1",
+        "node-cron": "^4.1.0",
+        "pdfkit": "^0.17.1",
+        "streamifier": "^0.1.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.10",
+        "prisma": "^6.10.1"
+    }
+}

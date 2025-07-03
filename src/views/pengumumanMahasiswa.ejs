@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- --- PERBAIKAN DI SINI --- -->
+    <!-- Menghapus link CSS lokal dan menambahkan skrip Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- --- AKHIR PERBAIKAN --- -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body class="bg-gray-100 flex">
+
+    <!-- Pastikan path ke partials/sidebar sudah benar -->
+    <%- include('partials/sidebarMahasiswa') %>
+
+    <main class="flex-1 p-6 md:p-8">
+        <div class="max-w-4xl mx-auto">
+            
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">📢 Pengumuman Praktikum</h1>
+
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Error!</strong>
+                    <span class="block sm:inline"><%= error %></span>
+                </div>
+            <% } else if (pengumumanList && pengumumanList.length > 0) { %>
+                <div class="space-y-6">
+                    <% pengumumanList.forEach(pengumuman => { %>
+                        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
+                            <p class="text-gray-800 text-base leading-relaxed">
+                                <%= pengumuman.isi %>
+                            </p>
+                            <div class="mt-4 text-right text-xs text-gray-500">
+                                <span>Dikirim oleh: <strong><%= pengumuman.pengirim_nama %></strong></span>
+                                <br>
+                                <span>
+                                    Pada: <%= new Date(pengumuman.dibuat_pada).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' }) %>
+                                </span>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-12 px-6 bg-white rounded-lg shadow-md">
+                    <i class="fas fa-info-circle text-4xl text-gray-400 mb-4"></i>
+                    <h2 class="text-xl font-semibold text-gray-700">Belum Ada Pengumuman</h2>
+                    <p class="text-gray-500 mt-2">Saat ini belum ada pengumuman untuk kelas praktikum ini.</p>
+                </div>
+            <% } %>
+
+        </div>
+    </main>
+</body>
+</html>

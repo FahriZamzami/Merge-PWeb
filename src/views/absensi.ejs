@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title><%= title %></title>
+    <style>
+        tbody tr, .attendance-dropdown {
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-purple-50">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { currentPath: currentPath, praktikum: praktikum }) %>
+
+        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <div class="max-w-7xl mx-auto">
+                <div class="bg-gradient-to-br from-violet-700 to-purple-400 p-6 sm:p-8 rounded-2xl shadow-lg">
+
+                    <header class="mb-8 text-center">
+                        <h1 class="text-4xl font-extrabold text-white tracking-tight">Absensi Kehadiran</h1>
+                        <p class="text-purple-200 mt-1">Praktikum: <%= praktikum.nama_praktikum %></p>
+                    </header>
+
+                    <form action="/absensi/save" method="POST">
+                        <input type="hidden" name="praktikum_id" value="<%= praktikum.id %>">
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                            <label for="jadwal_id" class="block text-lg font-semibold text-gray-700 mb-2">Pilih Jadwal Pertemuan</label>
+                            <select name="jadwal_id" id="jadwal_id" required class="w-full md:w-1/2 p-2 border rounded-md focus:ring-2 focus:ring-purple-500">
+                                <option value="">-- Pilih Jadwal --</option>
+                                <% jadwalList.forEach(jadwal => { %>
+                                    <option value="<%= jadwal.id %>">
+                                        <%= new Date(jadwal.tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' }) %> - <%= jadwal.materi %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        
+                        <div id="absensi-table-container" class="bg-white rounded-lg shadow-md overflow-x-auto hidden">
+                            <table class="min-w-full leading-normal">
+                                <thead>
+                                    <tr class="border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        <th class="px-5 py-3">NIM</th>
+                                        <th class="px-5 py-3">Nama Mahasiswa</th>
+                                        <th class="px-5 py-3 w-48">Status Kehadiran</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% mahasiswaList.forEach(mhs => { %>
+                                    <tr class="border-b border-gray-200" id="row-<%= mhs.user_id %>">
+                                        <td class="px-5 py-4 text-sm font-mono"><%= mhs.user.id %></td>
+                                        <td class="px-5 py-4 text-sm"><%= mhs.user.username %></td>
+                                        <td class="px-5 py-4 text-sm">
+                                            <select name="kehadiran[<%= mhs.user_id %>]" required class="attendance-dropdown w-full p-2 border rounded-md" data-user-id="<%= mhs.user_id %>">
+                                                <option value="Hadir">Hadir</option>
+                                                <option value="Tidak_Hadir" selected>Tidak Hadir</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-8 flex justify-end">
+                            <button type="submit" id="simpan-button" class="bg-white text-purple-700 font-bold py-3 px-6 rounded-lg hover:bg-purple-100 transition duration-300 shadow-lg hidden">
+                                Simpan Absensi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const jadwalSelect = document.getElementById('jadwal_id');
+        const tableContainer = document.getElementById('absensi-table-container');
+        const simpanButton = document.getElementById('simpan-button');
+        const existingAbsensi = JSON.parse('<%- existingAbsensi %>');
+        const allDropdowns = document.querySelectorAll('.attendance-dropdown');
+
+        function updateStatusAppearance(selectElement) {
+            const selectedStatus = selectElement.value;
+            const userId = selectElement.dataset.userId;
+            const tableRow = document.getElementById(`row-${userId}`);
+
+            tableRow.classList.remove('bg-green-50', 'bg-red-50');
+            selectElement.classList.remove('bg-green-200', 'text-green-800', 'font-bold', 'bg-red-200', 'text-red-800');
+
+            if (selectedStatus === 'Hadir') {
+                tableRow.classList.add('bg-green-50');
+                selectElement.classList.add('bg-green-200', 'text-green-800', 'font-bold');
+            } else if (selectedStatus === 'Tidak_Hadir') {
+                tableRow.classList.add('bg-red-50');
+                selectElement.classList.add('bg-red-200', 'text-red-800', 'font-bold');
+            }
+        }
+
+        jadwalSelect.addEventListener('change', function() {
+            const selectedJadwalId = parseInt(this.value);
+            
+            if (selectedJadwalId) {
+                tableContainer.classList.remove('hidden');
+                simpanButton.classList.remove('hidden');
+                allDropdowns.forEach(dropdown => {
+                    const userId = dropdown.dataset.userId;
+                    const absensiRecord = existingAbsensi.find(absen => absen.jadwal_id === selectedJadwalId && absen.user_id === userId);
+                    dropdown.value = absensiRecord ? absensiRecord.status : 'Tidak_Hadir';
+                    updateStatusAppearance(dropdown);
+                });
+            } else {
+                tableContainer.classList.add('hidden');
+                simpanButton.classList.add('hidden');
+            }
+        });
+
+        allDropdowns.forEach(dropdown => {
+            dropdown.addEventListener('change', function() {
+                updateStatusAppearance(this);
+            });
+        });
+    </script>
+</body>
+</html>

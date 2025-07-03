@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title><%= title %></title>
+</head>
+<body class="bg-purple-50">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { praktikum: praktikum, currentPath: currentPath }) %>
+
+        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <header class="flex justify-between items-center mb-6">
+                <div>
+                    <a href="/praktikum/<%= kuis.praktikum_id %>/kuis" class="text-purple-600 hover:underline flex items-center mb-2">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Kembali ke Daftar Kuis
+                    </a>
+                    <h1 class="text-3xl font-bold text-gray-800">Daftar Soal: <%= kuis.judul %></h1>
+                    <p class="text-gray-500 mt-1">Total Soal: <%= soalList.length %></p>
+                </div>
+                <a href="/kuis/<%= kuis.id %>/soal/tambah" class="bg-purple-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-purple-700 transition duration-300">
+                    <i class="fas fa-plus mr-2"></i>
+                    Tambah Soal Lagi
+                </a>
+            </header>
+
+            <div class="space-y-6">
+                <% if (soalList.length > 0) { %>
+                    <% soalList.forEach((soal, index) => { %>
+                        <div class="bg-gray-50 rounded-lg p-5">
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="text-sm font-semibold text-gray-600">Soal <%= index + 1 %></p>
+                                <% if (soal.tipe === 'essay') { %>
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-200 text-yellow-800">ESSAY</span>
+                                <% } else { %>
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-200 text-blue-800">PILIHAN GANDA</span>
+                                <% } %>
+                            </div>
+                            <p class="text-gray-800 text-lg"><%= soal.pertanyaan %></p>
+                            
+                            <% if (soal.tipe === 'pilihan_ganda') { %>
+                                <div class="mt-4 space-y-2 pl-6">
+                                    <% ['a', 'b', 'c', 'd', 'e'].forEach(opt => { %>
+                                        <% const opsi = soal['opsi_' + opt]; %>
+                                        <% if (opsi) { %>
+                                            <p class="text-gray-700 <%= soal.jawaban_benar === opsi ? 'text-green-600 font-bold' : '' %>">
+                                                <%= opt.toUpperCase() %>. <%= opsi %>
+                                                <% if (soal.jawaban_benar === opsi) { %>
+                                                    <i class="fas fa-check text-green-600 ml-2"></i>
+                                                <% } %>
+                                            </p>
+                                        <% } %>
+                                    <% }) %>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="text-center py-10">
+                        <p class="text-gray-500">Belum ada soal yang ditambahkan untuk kuis ini.</p>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+</body>
+</html> 

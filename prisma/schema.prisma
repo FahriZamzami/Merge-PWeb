@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ================= ENUM =================
+
+enum Peran {
+  admin
+  mahasiswa
+  asisten
+}
+
+enum StatusTugas {
+  open
+  close
+}
+
+enum StatusAbsensi {
+  Hadir
+  Tidak_Hadir
+}
+
+enum StatusJadwal {
+  Selesai
+  Belum_Mulai
+}
+
+enum StatusKuis {
+  aktif
+  tidak_aktif
+}
+
+enum TipePertanyaan {
+  pilihan_ganda
+  benar_salah
+  essay
+}
+
+// ================ MODEL =================
+
+model user {
+  id              String            @id
+  username        String            @unique
+  kata_sandi      String
+  peran           Peran
+  dibuat_pada     DateTime          @default(now())
+
+  mahasiswa       mahasiswa[]
+  pengumpulan     pengumpulan[]
+  pengumuman      pengumuman[]      @relation("PengumumanPembuat")
+  absensi         absensi[]
+  asistenLab      asistenLab[]
+  jawabanKuis     jawabanKuis[]
+}
+
+model lab {
+  id          Int          @id @default(autoincrement())
+  nama_lab    String
+  praktikum   praktikum[]
+  asistenLab  asistenLab[]
+}
+
+model asistenLab {
+  id      Int    @id @default(autoincrement())
+  user_id String
+  lab_id  Int
+  user    user   @relation(fields: [user_id], references: [id])
+  lab     lab    @relation(fields: [lab_id], references: [id])
+
+  @@unique([user_id, lab_id])
+}
+
+model praktikum {
+  id             Int          @id @default(autoincrement())
+  nama_praktikum String
+  kode_masuk     String       @unique
+  lab_id         Int
+  dibuat_pada    DateTime     @default(now())
+
+  lab            lab          @relation(fields: [lab_id], references: [id])
+  mahasiswa      mahasiswa[]
+  jadwal         jadwal[]
+  modul          modul[]
+  tugas          tugas[]
+  pengumuman     pengumuman[]
+  kuis           kuis[]
+}
+
+model mahasiswa {
+  id             Int       @id @default(autoincrement())
+  user_id        String
+  praktikum_id   Int
+  waktu_daftar   DateTime?
+  user           user      @relation(fields: [user_id], references: [id])
+  praktikum      praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, praktikum_id])
+}
+
+model jadwal {
+  id             Int           @id @default(autoincrement())
+  praktikum_id   Int
+  tanggal        DateTime
+  jam            DateTime
+  ruangan        String?
+  materi         String?
+  nama_pengajar  String?
+  dibuat_pada    DateTime      @default(now())
+  status         StatusJadwal  @default(Belum_Mulai)
+
+  praktikum      praktikum     @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
+  absensi        absensi[]
+}
+
+model modul {
+  id            Int       @id @default(autoincrement())
+  praktikum_id  Int
+  judul         String
+  file_path     String   @unique
+  diunggah_pada DateTime @default(now())
+
+  praktikum     praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
+
+  @@map("modul")
+}
+
+model tugas {
+  id               Int           @id @default(autoincrement())
+  praktikum_id     Int
+  judul            String
+  deskripsi        String?
+  fileTugas        String?
+  batas_waktu      DateTime
+  dibuat_pada      DateTime      @default(now())
+  status           StatusTugas   @default(open)
+  tutup_penugasan  Boolean       @default(false)
+
+  praktikum        praktikum     @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
+  pengumpulan      pengumpulan[]
+}
+
+model pengumpulan {
+  id           Int       @id @default(autoincrement())
+  tugas_id     Int
+  user_id      String
+  file_path    String?
+  waktu_kirim  DateTime?
+  nilai        Float?
+  catatan      String?
+
+  tugas        tugas     @relation(fields: [tugas_id], references: [id], onDelete: Cascade)
+  user         user      @relation(fields: [user_id], references: [id])
+}
+
+model pengumuman {
+  id           Int       @id @default(autoincrement())
+  praktikum_id Int
+  isi          String
+  dibuat_oleh  String
+  dibuat_pada  DateTime?
+
+  praktikum    praktikum @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
+  pembuat      user      @relation("PengumumanPembuat", fields: [dibuat_oleh], references: [id])
+}
+
+model absensi {
+  id        Int           @id @default(autoincrement())
+  user_id   String
+  jadwal_id Int
+  status    StatusAbsensi
+
+  user      user          @relation(fields: [user_id], references: [id])
+  jadwal    jadwal        @relation(fields: [jadwal_id], references: [id], onDelete: Cascade)
+}
+
+model kuis {
+  id               Int           @id @default(autoincrement())
+  praktikum_id     Int
+  judul            String
+  deskripsi        String?
+  waktu_mulai      DateTime
+  waktu_selesai    DateTime
+  durasi_menit     Int           @default(60)
+  status           StatusKuis    @default(tidak_aktif)
+  dibuat_pada      DateTime      @default(now())
+
+  praktikum        praktikum     @relation(fields: [praktikum_id], references: [id], onDelete: Cascade)
+  pertanyaan       pertanyaan[]
+  jawaban_kuis     jawabanKuis[]
+}
+
+model pertanyaan {
+  id                  Int                @id @default(autoincrement())
+  kuis_id             Int
+  pertanyaan          String
+  tipe                TipePertanyaan
+  opsi_a              String?
+  opsi_b              String?
+  opsi_c              String?
+  opsi_d              String?
+  opsi_e              String?
+  jawaban_benar       String
+  poin                Int                @default(1)
+  urutan              Int?
+
+  kuis                kuis               @relation(fields: [kuis_id], references: [id], onDelete: Cascade)
+  jawaban_pertanyaan  jawabanPertanyaan[]
+}
+
+model jawabanKuis {
+  id                  Int                @id @default(autoincrement())
+  kuis_id             Int
+  user_id             String
+  waktu_mulai         DateTime           @default(now())
+  waktu_selesai       DateTime?
+  total_poin          Float?
+  status              String             @default("sedang_berlangsung")
+
+  kuis                kuis               @relation(fields: [kuis_id], references: [id], onDelete: Cascade)
+  user                user               @relation(fields: [user_id], references: [id])
+  jawaban_pertanyaan  jawabanPertanyaan[]
+}
+
+model jawabanPertanyaan {
+  id                  Int               @id @default(autoincrement())
+  jawaban_kuis_id     Int
+  pertanyaan_id       Int
+  jawaban_user        String?
+  poin_didapat        Float?
+  waktu_jawab         DateTime          @default(now())
+
+  jawaban_kuis        jawabanKuis       @relation(fields: [jawaban_kuis_id], references: [id])
+  pertanyaan          pertanyaan        @relation(fields: [pertanyaan_id], references: [id])
+}
