@@ -45,7 +45,7 @@ app.use('/', mainRouter);
 app.use('/', adminRouter); 
 
 // ===== START SERVER =====
-const PORT = 3002;
+const PORT = 7000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
 });
