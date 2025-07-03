@@ -1,15 +1,14 @@
 // seeder.js
 const { PrismaClient } = require('@prisma/client');
-// const bcrypt = require('bcrypt'); // bcrypt tidak lagi diperlukan
+const bcrypt = require('bcrypt'); // bcrypt diaktifkan kembali
 
 const prisma = new PrismaClient();
 
 async function main() {
     console.log('Memulai proses seeding... 🌱');
 
-    // 1. Kata sandi tidak lagi di-hash.
-    // Blok kode untuk hashing menggunakan bcrypt telah dihapus.
-    console.log('Menyiapkan kata sandi (plain text)... ✅');
+    // 1. Kata sandi admin akan di-hash menggunakan bcrypt.
+    console.log('Menyiapkan kata sandi (admin di-hash, lainnya plain text)... ✅');
 
     // 2. Membersihkan data lama untuk menghindari konflik
     console.log('Membersihkan data lama dari database...');
@@ -40,7 +39,7 @@ async function main() {
     });
     console.log('Tabel `Lab` berhasil di-seed.');
 
-    // Tabel User dengan kata sandi plain text sesuai peran
+    // Data user dasar
     const users = [
         { id: '02', username: 'della', peran: 'mahasiswa' },
         { id: '2311522031', username: 'Pablo', peran: 'mahasiswa' },
@@ -64,21 +63,25 @@ async function main() {
         { id: 'asllea001', username: 'Vannesa Tania', peran: 'asisten' },
     ];
 
-    const usersWithPasswords = users.map(user => {
-        let kata_sandi;
-        switch (user.peran) {
-            case 'admin':
-                kata_sandi = 'sayasukadurian'; // Plain text
-                break;
-            case 'asisten':
-                kata_sandi = 'labkece123'; // Plain text
-                break;
-            case 'mahasiswa':
-                kata_sandi = 'password123'; // Plain text
-                break;
-        }
-        return { ...user, kata_sandi };
-    });
+    // Proses pembuatan kata sandi secara dinamis dan asynchronous
+    const usersWithPasswords = await Promise.all(
+        users.map(async (user) => {
+            let kata_sandi;
+            switch (user.peran) {
+                case 'admin':
+                    // Kata sandi admin di-hash dengan bcrypt, salt round 10
+                    kata_sandi = await bcrypt.hash('sayasukadurian', 10);
+                    break;
+                case 'asisten':
+                    kata_sandi = 'labkece123'; // Plain text
+                    break;
+                case 'mahasiswa':
+                    kata_sandi = 'password123'; // Plain text
+                    break;
+            }
+            return { ...user, kata_sandi };
+        })
+    );
 
     await prisma.user.createMany({
         data: usersWithPasswords,
@@ -149,13 +152,19 @@ async function main() {
     });
     console.log('Tabel `Tugas` berhasil di-seed.');
     
-    // Tabel Pengumpulan
+    // Tabel Pengumpulan -- DATA TELAH DIPERBARUI
     await prisma.pengumpulan.createMany({
         data: [
-            { tugas_id: 2, user_id: '2411521001', file_path: '1750436913593-Instruksi-Modul-Praktikum-Data-Mining-B (3).png', waktu_kirim: new Date('2025-06-23T01:54:08.000Z'), nilai: 90, catatan: 'Nice' },
-            { tugas_id: 2, user_id: '2411521002', file_path: '1750436880889-Tugas Bootcamp BE Pertemuan 2 - Fahri Zamzami.pdf', waktu_kirim: new Date('2025-06-23T01:54:08.000Z'), nilai: 98, catatan: 'mantap' },
-            { tugas_id: 5, user_id: '2411521001', file_path: '1751109137470-2311521014_Fahri Zamzami.pdf', waktu_kirim: null, nilai: 92, catatan: 'Nice' },
-            { tugas_id: 5, user_id: '2411521002', file_path: '1750436880889-Tugas Bootcamp BE Pertemuan 2 - Fahri Zamzami.pdf', waktu_kirim: new Date('2025-07-01T17:50:25.000Z'), nilai: null, catatan: null },
+            { tugas_id: 2, user_id: '2411521001', file_path: '1750436913593-Instruksi-Modul-Praktikum-Data-Mining-B (3).png', waktu_kirim: new Date(), nilai: null, catatan: null },
+            { tugas_id: 2, user_id: '2411521002', file_path: '1750436880889-Tugas Bootcamp BE Pertemuan 2 - Fahri Zamzami.pdf', waktu_kirim: new Date(), nilai: null, catatan: null },
+            { tugas_id: 2, user_id: '2411521003', file_path: '1750432553186-1150-1-3005-1-10-20231216 (1).pdf', waktu_kirim: new Date(), nilai: null, catatan: null },
+            { tugas_id: 2, user_id: '2411521004', file_path: '1750417976506-download.jpeg', waktu_kirim: new Date(), nilai: null, catatan: null },
+            { tugas_id: 2, user_id: '2411521005', file_path: '1750361497720-1150-1-3005-1-10-20231216.pdf', waktu_kirim: new Date(), nilai: null, catatan: null },
+            { tugas_id: 2, user_id: '2411521006', file_path: '1750169581735-MODUL_1_2.pdf', waktu_kirim: new Date(), nilai: null, catatan: null },
+            { tugas_id: 2, user_id: '2411521007', file_path: '1750169861030-22280-65234-7-PB.pdf', waktu_kirim: new Date(), nilai: null, catatan: null },
+            { tugas_id: 2, user_id: '2411521008', file_path: '1750297832570-Cetak Rencana Studi - Portal Akademik Universitas Andalas.pdf', waktu_kirim: new Date(), nilai: null, catatan: null },
+            { tugas_id: 2, user_id: '2411521009', file_path: '1750298090008-KRS UAS SEMESTER 4.pdf', waktu_kirim: new Date(), nilai: null, catatan: null },
+            { tugas_id: 2, user_id: '2411521010', file_path: '1750298928877-WhatsApp Image 2025-05-21 at 12.20.55_3babbe2f.jpg', waktu_kirim: new Date(), nilai: null, catatan: null },
         ],
     });
     console.log('Tabel `Pengumpulan` berhasil di-seed.');

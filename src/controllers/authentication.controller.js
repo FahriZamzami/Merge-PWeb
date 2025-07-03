@@ -28,7 +28,7 @@ const login = async (req, res) => {
 
         // Arahkan berdasarkan peran
         if (user.peran === 'admin') {
-            return res.redirect('/admin/dashboard'); // Ganti dengan URL dashboard admin Anda
+            return res.redirect('/admin'); // Ganti dengan URL dashboard admin Anda
         }
         if (user.peran === 'asisten') {
             return res.redirect('/lab');
