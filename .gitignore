@@ -1,9 +1,6 @@
 # Node modules
 node_modules/
 
-# Environment variables
-.env
-
 # Prisma generated files (misal digunakan untuk client)
 generated/prisma/
 
