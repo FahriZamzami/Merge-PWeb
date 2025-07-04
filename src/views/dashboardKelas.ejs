@@ -101,13 +101,12 @@
 
     <main class="container mx-auto px-8 py-8">
         <div class="mb-8">
-        <div class="mb-8">
             <div class="search-container">
                 <div class="relative">
                     <input type="text" 
-                        id="searchKelas" 
-                        placeholder="Cari kelas praktikum..." 
-                        class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-purple-500 focus:outline-none shadow-lg">
+                           id="searchKelas" 
+                           placeholder="Cari kelas praktikum..." 
+                           class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-purple-500 focus:outline-none shadow-lg">
                     <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
                         <i class="fas fa-search text-gray-400 text-xl"></i>
                     </div>
@@ -117,8 +116,8 @@
         </div>
 
         <div id="kelasData" 
-            data-semua-kelas='<%- JSON.stringify(semuaKelas) %>'
-            style="display: none;">        </div>
+             data-semua-kelas='<%- JSON.stringify(semuaKelas) %>'
+             style="display: none;"></div>
 
         <div class="mb-12">
             <div class="flex items-center mb-6">
@@ -150,9 +149,6 @@
                             </div>
                             <h3 class="text-xl font-bold text-gray-800 mb-2"><%= kelas.nama_praktikum %></h3>
                             <p class="text-gray-600 mb-4"><%= kelas.lab.nama_lab %></p>
-                            <p class="text-sm text-gray-500 mb-4">
-                                Kode Akses: <span class="font-mono bg-gray-100 px-2 py-1 rounded"><%= kelas.kode_masuk %></span>
-                            </p>
                             
                             <% if (kelas.sudahTerdaftar) { %>
                                 <button data-praktikum-id="<%= kelas.id %>" 
@@ -182,15 +178,13 @@
                 <h3 class="text-2xl font-bold text-gray-800 mb-4" id="modalKelasTitle">Masuk Kelas</h3>
                 <p class="text-gray-600 mb-6">
                     Masukkan kode akses untuk bergabung dengan kelas ini.
-                    <br><br>
-                    <strong>Kode Akses:</strong> <span id="modalKodeAkses" class="font-mono bg-gray-100 px-3 py-2 rounded-lg text-lg"></span>
                 </p>
                 
                 <div class="mb-6">
                     <input type="text" 
-                        id="inputKodeMasuk" 
-                        placeholder="Masukkan kode akses..." 
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none text-center text-lg font-mono">
+                           id="inputKodeMasuk" 
+                           placeholder="Masukkan kode akses..." 
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none text-center text-lg font-mono">
                 </div>
                 
                 <div class="flex space-x-4">
@@ -221,7 +215,7 @@
                         Batal
                     </button>
                     <a href="/logout" 
-                        class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl transition-colors inline-block text-center">
+                       class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl transition-colors inline-block text-center">
                         <i class="fas fa-sign-out-alt mr-2"></i>Logout
                     </a>
                 </div>
@@ -230,20 +224,16 @@
     </div>
 
     <script>
-
         const semuaKelas = JSON.parse(document.getElementById('kelasData').dataset.semuaKelas);
         let currentKodeMasuk = '';
 
-
         document.addEventListener('DOMContentLoaded', function() {
-
             document.querySelectorAll('.btn-masuk-terdaftar').forEach(button => {
                 button.addEventListener('click', function() {
                     const praktikumId = this.getAttribute('data-praktikum-id');
                     masukKelasTerdaftar(praktikumId);
                 });
             });
-
 
             document.querySelectorAll('.btn-masuk-kode').forEach(button => {
                 button.addEventListener('click', function() {
@@ -253,7 +243,6 @@
                 });
             });
         });
-
 
         document.getElementById('searchKelas').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
@@ -271,11 +260,10 @@
             });
         });
 
-
         function showKodeMasukModal(namaKelas, kodeAkses) {
             currentKodeMasuk = kodeAkses;
             document.getElementById('modalKelasTitle').textContent = `Masuk ${namaKelas}`;
-            document.getElementById('modalKodeAkses').textContent = kodeAkses;
+
             document.getElementById('inputKodeMasuk').value = '';
             document.getElementById('kodeMasukModal').style.display = 'block';
         }
@@ -288,7 +276,6 @@
             const inputKode = document.getElementById('inputKodeMasuk').value.trim();
             
             if (inputKode === currentKodeMasuk) {
-
                 fetch('/dashboard-kelas/masuk', {
                     method: 'POST',
                     credentials: 'include',
@@ -316,7 +303,6 @@
             }
         }
 
-
         function masukKelasTerdaftar(praktikumId) {
             fetch(`/dashboard-kelas/masuk-terdaftar/${praktikumId}`, {
                 method: 'POST',
@@ -328,7 +314,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-
                     window.location.href = '/home';
                 } else {
                     alert('Error: ' + data.message);
@@ -340,7 +325,6 @@
             });
         }
 
-
         function confirmLogout() {
             document.getElementById('logoutModal').style.display = 'block';
         }
@@ -348,7 +332,6 @@
         function closeLogoutModal() {
             document.getElementById('logoutModal').style.display = 'none';
         }
-
 
         window.onclick = function(event) {
             const kodeModal = document.getElementById('kodeMasukModal');
@@ -362,7 +345,6 @@
             }
         }
 
-
         document.getElementById('inputKodeMasuk').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 submitKodeMasuk();
@@ -370,4 +352,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
