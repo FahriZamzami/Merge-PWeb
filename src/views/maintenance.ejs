@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Maintenance Website</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+    .card {
+      background: rgba(255 255 255 / 0.1);
+      padding: 3rem 2.5rem;
+      border-radius: 2rem;
+      max-width: 480px;
+      box-shadow: 0 20px 60px rgb(99 102 241 / 0.3);
+      user-select: none;
+      animation: fadeInUp 0.7s ease forwards;
+    }
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      font-weight: 700;
+    }
+    p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+      color: #d1d5db;
+    }
+    .gear {
+      margin: 0 auto 2rem;
+      width: 100px;
+      height: 100px;
+      filter: drop-shadow(0 0 5px rgba(255 255 255 / 0.7));
+      animation: gear-spin 4s linear infinite;
+    }
+    @keyframes gear-spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .bg-purple-gradient {
+      background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+    }
+    .card-purple {
+      background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+      border: 1px solid #c4b5fd;
+      box-shadow: 0 4px 24px 0 rgba(124,58,237,0.10);
+      color: #fff;
+    }
+    label, .form-label {
+      color: #fff !important;
+    }
+  </style>
+</head>
+<body class="bg-purple-gradient text-white min-h-screen">
+  <a href="/admin" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg flex items-center gap-2" style="position: absolute; top: 2rem; left: 2rem; z-index: 100;">
+    <span class="text-xl">←</span>
+    <span>Kembali ke Dashboard</span>
+  </a>
+  <main class="card card-purple" role="main" aria-live="polite" aria-atomic="true" tabindex="-1">
+    <svg class="gear" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" aria-label="Ikon gear berputar">
+      <circle cx="32" cy="32" r="30" stroke="white" stroke-opacity="0.3" stroke-width="4"/>
+      <path fill="white" d="M32 18a14 14 0 0 1 14 14 14 14 0 0 1-14 14 14 14 0 0 1-14-14 14 14 0 0 1 14-14zm0 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/>
+      <path stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M44 14l-4 4M20 14l4 4M14 44l4-4M44 44l-4-4"/>
+    </svg>
+
+    <h1>⚙️ Situs Sedang Maintenance</h1>
+    <p>
+      Kami sedang melakukan perbaikan untuk meningkatkan layanan.<br/>
+      Mohon bersabar dan coba lagi nanti.
+    </p>
+  </main>
+</body>
+</html>

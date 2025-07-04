@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Home Lab - LABCORNER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#A188E3]">
+    <div class="flex h-screen">
+        <aside class="w-72 bg-[#6D28D9] text-white flex flex-col p-4 flex-shrink-0">
+            <div class="flex items-center justify-between p-4">
+                <h1 class="text-2xl font-bold tracking-wider">LABCORNER</h1>
+                <button class="lg:hidden">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+            <nav class="flex-1 px-2 mt-8 space-y-3">
+                <a href="/lab" class="flex items-center space-x-4 p-3 rounded-lg bg-white/20 shadow-lg ring-1 ring-white/20">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9.5L12 2L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="font-semibold">Home Lab</span>
+                </a>
+                <a href="/lab/<%= praktikumList[0]?.lab_id || lab.id %>/jadwal" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2V5M16 2V5M3 8H21M5 22H19C20.1046 22 21 21.1046 21 20V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 3 3.89543 3 5V20C3 21.1046 3.89543 22 5 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="font-medium">Jadwal Lab</span>
+                </a>
+                <a href="/lab/<%= praktikumList[0]?.lab_id || lab.id %>/mahasiswa" class="flex items-center space-x-4 p-3 rounded-lg text-white/80 hover:bg-white/10">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 21V19C22.9992 17.9831 22.5932 17.0132 21.8727 16.2927C21.1522 15.5722 20.1824 15.1662 19.165 15.13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 11C18.8475 10.9992 20.4839 9.59382 20.8942 7.8249C21.3045 6.05598 20.4787 4.25338 18.9416 3.23863C17.4045 2.22388 15.4673 2.20339 13.9055 3.18516" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="font-medium">Semua Mahasiswa Lab</span>
+                </a>
+            </nav>
+            <div class="p-2">
+                <button id="tambahKelasBtn" class="w-full flex items-center space-x-4 p-3 rounded-lg text-white/90 hover:bg-white/10 border-2 border-white/30">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path></svg>
+                    <span class="font-semibold">Tambah Kelas</span>
+                </button>
+            </div>
+            <div class="mt-auto p-2">
+                <a href="/logout" class="w-full flex items-center space-x-4 p-3 rounded-lg text-white/90 bg-red-500 hover:bg-red-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H3"></path></svg>
+                    <span class="font-semibold">Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            <main class="p-8">
+                <h1 class="text-4xl font-bold text-white text-center mb-12">
+                    <%= lab?.nama_lab || 'Tidak Diketahui' %>
+                </h1>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+                    <% if (praktikumList && praktikumList.length > 0) { %>
+                        <% praktikumList.forEach(praktikum => { %>
+                            <div class="bg-[#E9D5FF] rounded-2xl p-6 pt-12 text-center shadow-lg relative">
+                                <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#8B5CF6] p-4 rounded-xl shadow-md">
+                                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h8a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.722 16h8.556M12 16v4m-4-11V6a2 2 0 012-2h4a2 2 0 012 2v4m-6 0h.01M12 6h.01M15 6h.01M18 6h.01M21 11h.01M3 11h.01M4 21h16" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M4 4l2-2 2 2M8 4l2 2 2-2" />
+                                    </svg>
+                                </div>
+
+                                <h3 class="text-xl font-bold text-gray-800 mt-4"><%= praktikum.nama_praktikum %></h3>
+
+                                <div class="flex space-x-2 mt-6">
+                                    <a href="/kelas/<%= praktikum.id %>"
+                                        class="flex-1 bg-indigo-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-indigo-600 transition-colors text-sm">
+                                        Buka
+                                    </a>
+                                    <a href="/kelas/<%= praktikum.id %>/edit"
+                                        class="bg-yellow-500 text-white font-semibold px-4 py-2 rounded-full hover:bg-yellow-600 transition-colors text-sm">
+                                        Edit
+                                    </a>
+                                    <button type="button" 
+                                            data-nama-kelas="<%= praktikum.nama_praktikum %>"
+                                            data-delete-url="/kelas/<%= praktikum.id %>/delete"
+                                            class="btn-hapus bg-red-500 text-white font-semibold px-4 py-2 rounded-full hover:bg-red-600 transition-colors text-sm">
+                                        Hapus
+                                    </button>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p class="col-span-3 text-center text-white/80 mt-10">Belum ada kelas praktikum yang tersedia.</p>
+                    <% } %>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="tambahKelasModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex justify-center items-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-xl transform transition-all" style="max-height: 90vh; overflow-y: auto;">
+            <form action="/kelas/create" method="POST">
+                <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">Tambah Kelas Baru</h2>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-purple-600 font-semibold mb-1">Nama Praktikum</label>
+                        <input type="text" name="nama_praktikum" placeholder="Contoh: Data Mining - Kelas A"
+                            class="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 transition" required />
+                    </div>
+                    <div>
+                        <label class="block text-purple-600 font-semibold mb-1">Lab</label>
+                        <select name="lab_id" class="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 transition" required>
+                            <% if (labs && labs.length > 0) { %>
+                                <% labs.forEach(l => { %>
+                                    <option value="<%= l.id %>" <%= (lab && lab.id === l.id) ? 'selected' : '' %>><%= l.nama_lab %></option>
+                                <% }) %>
+                            <% } else { %>
+                                <option disabled>Tidak ada lab tersedia</option>
+                            <% } %>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-purple-600 font-semibold mb-1">Kode Masuk</label>
+                        <input type="text" name="kode_masuk" placeholder="Buat kode unik untuk kelas"
+                            class="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 transition" required />
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4 mt-8">
+                    <button type="button" id="batalBtn" class="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium">Batal</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-semibold">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="hapusKonfirmasiModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex justify-center items-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md transform transition-all text-center">
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
+                <i class="fas fa-trash-alt text-3xl text-red-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Konfirmasi Hapus</h2>
+            <p class="text-gray-600 mb-8">Apakah Anda yakin ingin menghapus kelas ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-center space-x-4">
+                <button type="button" id="batalHapusBtn" class="bg-gray-200 text-gray-800 px-8 py-3 rounded-lg hover:bg-gray-300 transition-colors font-medium">Batal</button>
+                <button type="button" id="konfirmasiHapusBtn" class="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const successMessage = urlParams.get('success');
+        if (successMessage) {
+
+            window.history.replaceState({}, document.title, "/lab");
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const tambahKelasBtn = document.getElementById('tambahKelasBtn');
+            const tambahKelasModal = document.getElementById('tambahKelasModal');
+            const batalBtn = document.getElementById('batalBtn');
+            
+            tambahKelasBtn.addEventListener('click', () => {
+                tambahKelasModal.classList.remove('hidden');
+            });
+
+            const closeModal = () => {
+                tambahKelasModal.classList.add('hidden');
+            };
+
+            batalBtn.addEventListener('click', closeModal);
+
+            tambahKelasModal.addEventListener('click', (e) => {
+                if (e.target === tambahKelasModal) {
+                    closeModal();
+                }
+            });
+
+
+            const hapusKonfirmasiModal = document.getElementById('hapusKonfirmasiModal');
+            const konfirmasiHapusBtn = document.getElementById('konfirmasiHapusBtn');
+            const batalHapusBtn = document.getElementById('batalHapusBtn');
+            let deleteUrlToSubmit = '';
+
+            function openHapusModal(deleteUrl) {
+                deleteUrlToSubmit = deleteUrl;
+                hapusKonfirmasiModal.classList.remove('hidden');
+            }
+
+            function closeHapusModal() {
+                hapusKonfirmasiModal.classList.add('hidden');
+            }
+
+            batalHapusBtn.addEventListener('click', closeHapusModal);
+
+            konfirmasiHapusBtn.addEventListener('click', () => {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = deleteUrlToSubmit;
+                document.body.appendChild(form);
+                form.submit();
+            });
+            
+
+            document.querySelectorAll('.btn-hapus').forEach(button => { 
+                button.addEventListener('click', function() {
+                    const deleteUrl = this.dataset.deleteUrl;
+                    openHapusModal(deleteUrl);
+                });
+            });
+
+            hapusKonfirmasiModal.addEventListener('click', (e) => {
+                if (e.target === hapusKonfirmasiModal) {
+                    closeHapusModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

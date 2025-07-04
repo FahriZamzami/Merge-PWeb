@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title || 'Dashboard LabCorner' %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    body.fade-in {
+      opacity: 1;
+    }
+    .dashboard-section {
+      margin-bottom: 1.5rem;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .bg-purple-gradient {
+      background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+    }
+    .card-purple {
+      background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+      border: 1px solid #c4b5fd;
+      box-shadow: 0 4px 24px 0 rgba(124,58,237,0.10);
+    }
+    .accent-purple {
+      color: #7c3aed;
+    }
+    .border-purple {
+      border-color: #a78bfa;
+    }
+  </style>
+</head>
+<body class="bg-purple-gradient min-h-screen">
+
+<header class="bg-gradient-to-r from-purple-700 via-purple-500 to-purple-400 shadow-lg border-b border-purple-300 sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center py-3">
+      <div class="flex items-center space-x-4">
+        <div class="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+          <i class="fas fa-flask text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-white">
+            LabCorner
+          </h1>
+          <p class="text-xs text-purple-200">Laboratory Management System</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <div class="text-right hidden sm:block">
+          <p class="text-xs text-gray-600" id="currentDate">Loading...</p>
+          <p class="text-sm font-semibold text-gray-800" id="currentTime">Loading...</p>
+        </div>
+        <div class="flex items-center space-x-2 bg-green-100 px-3 py-1 rounded-full">
+          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span class="text-xs font-medium text-green-700">Online</span>
+        </div>
+        <button onclick="logout()" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold px-3 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center space-x-2 text-sm">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="hidden sm:inline">Logout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+  <div class="mb-4">
+    <h1 class="text-3xl font-bold text-white mb-2">Welcome back! 👋</h1>
+    <p class="text-lg text-purple-50 mb-6">Here's what's happening in your laboratories today</p>
+  </div>
+
+  <div class="dashboard-grid dashboard-section">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <div class="card-purple p-6 rounded-xl shadow-md border-purple p-3 hover:shadow-lg transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-medium text-purple-100">Total Labs</p>
+            <p class="text-2xl font-bold text-white"><%= labs.length %></p>
+          </div>
+          <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-building text-blue-600 text-sm"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-purple p-6 rounded-xl shadow-md border-purple p-3 hover:shadow-lg transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-medium text-purple-100">Active Users</p>
+            <p class="text-2xl font-bold text-white"><%= stats.activeUsers %></p>
+            <p class="text-xs text-blue-600 mt-1">In system</p>
+          </div>
+          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-users text-green-600 text-sm"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-purple p-6 rounded-xl shadow-md border-purple p-3 hover:shadow-lg transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-medium text-purple-100">Announcements</p>
+            <p class="text-2xl font-bold text-white"><%= stats.totalAnnouncements %></p>
+            <p class="text-xs text-purple-600 mt-1">Published</p>
+          </div>
+          <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-bullhorn text-purple-600 text-sm"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-purple p-6 rounded-xl shadow-md border-purple p-3 hover:shadow-lg transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-medium text-purple-100">System Status</p>
+            <p class="text-2xl font-bold text-white">100%</p>
+            <p class="text-xs text-green-600 mt-1">All systems normal</p>
+          </div>
+          <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+            <i class="fas fa-shield-alt text-emerald-600 text-sm"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid dashboard-section">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div class="lg:col-span-3 space-y-4">
+        <div class="card-purple p-6 rounded-xl shadow-md border border-gray-100 p-4">
+        <div class="card-purple p-6 rounded-xl shadow-md border border-gray-100 p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-white">Laboratories</h3>
+            <div class="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-microscope text-purple-600 text-xs"></i>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <% if (labs && labs.length > 0) { %>
+              <%
+                const labThemes = {
+                  'LEA':    { theme: 'blue',   icon: 'fa-code' },
+                  'LABGIS': { theme: 'green',  icon: 'fa-map' },
+                  'LBI':    { theme: 'purple', icon: 'fa-chart-line' },
+                  'LDKOM':  { theme: 'orange', icon: 'fa-lightbulb' },
+                  'default':{ theme: 'gray',   icon: 'fa-flask' }
+                };
+              %>
+              <% labs.forEach(lab => { %>
+                <% const labInfo = labThemes[lab.nama_lab] || labThemes['default']; %>
+                <a href="/lab/<%= lab.nama_lab %>" data-theme="<%= labInfo.theme %>" class="lab-card-container group block p-3 rounded-lg border transition-all duration-300 transform hover:scale-105">
+                  <div class="flex items-center space-x-3">
+                    <div class="lab-icon w-10 h-10 rounded-lg flex items-center justify-center transition-colors">
+                      <i class="fas <%= labInfo.icon %> text-white text-sm"></i>
+                    </div>
+                    <div>
+                      <h4 class="lab-title font-bold text-sm text-white"><%= lab.nama_lab %></h4>
+                      <p class="lab-description text-xs text-white"><%= lab.deskripsi ? lab.deskripsi.substring(0, 25) + '...' : 'No description' %></p>
+                      <p class="lab-dosen text-xs mt-1"><%= lab.dosen %></p>
+                    </div>
+                  </div>
+                </a>
+              <% }); %>
+            <% } else { %>
+              <p class="col-span-full text-gray-500">No labs found in the database.</p>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="card-purple p-6 rounded-xl shadow-md border border-gray-100 p-4">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-white">Quick Actions</h3>
+            <div class="w-6 h-6 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-bolt text-indigo-600 text-xs"></i>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-center">
+            <a href="/pengumuman" class="group p-2 rounded-lg hover:bg-purple-50 transition-colors">
+              <div class="w-16 h-16 mx-auto bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                <i class="fas fa-plus text-purple-600 text-2xl"></i>
+              </div>
+              <p class="mt-2 text-sm font-semibold text-gray-700">Create Annc.</p>
+            </a>
+            <a href="/pengumuman/list" class="group p-2 rounded-lg hover:bg-blue-50 transition-colors">
+              <div class="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <i class="fas fa-list text-blue-600 text-2xl"></i>
+              </div>
+              <p class="mt-2 text-sm font-semibold text-gray-700">View Annc.</p>
+            </a>
+            <a href="/user" class="group p-2 rounded-lg hover:bg-green-50 transition-colors">
+              <div class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                <i class="fas fa-users-cog text-green-600 text-2xl"></i>
+              </div>
+              <p class="mt-2 text-sm font-semibold text-gray-700">Manage Users</p>
+            </a>
+            <a href="/informasi" class="group p-2 rounded-lg hover:bg-orange-50 transition-colors">
+              <div class="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                <i class="fas fa-info-circle text-orange-600 text-2xl"></i>
+              </div>
+              <p class="mt-2 text-sm font-semibold text-gray-700">Lab Info</p>
+            </a>
+            <a href="/statistics" class="group p-2 rounded-lg hover:bg-indigo-50 transition-colors">
+              <div class="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+                <i class="fas fa-chart-bar text-indigo-600 text-2xl"></i>
+              </div>
+              <p class="mt-2 text-sm font-semibold text-gray-700">Statistics</p>
+            </a>
+          </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="card-purple p-6 rounded-xl shadow-md border border-gray-100 p-4 mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-white">Recent Activity</h3>
+            <div class="w-6 h-6 bg-yellow-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-clock text-yellow-600 text-xs"></i>
+            </div>
+          </div>
+          <div class="space-y-3 text-gray-500 text-center">
+            <p class="text-purple-50">Tidak ada aktivitas terbaru.</p>
+          </div>
+        </div>
+
+        <!-- Lab Performance Overview -->
+        <div class="card-purple p-6 rounded-xl shadow-md border border-gray-100 p-4 mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-white">Lab Performance Overview</h3>
+            <div class="w-6 h-6 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-trophy text-emerald-600 text-xs"></i>
+            </div>
+          </div>
+          <div class="text-gray-500 text-center">
+            <p class="text-purple-50">Belum ada data performa lab.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - System Management -->
+      <div class="space-y-4">
+        <!-- System Management -->
+        <div class="card-purple p-6 rounded-xl shadow-md border border-gray-100 p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-white">System Management</h3>
+            <div class="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-cogs text-red-600 text-xs"></i>
+            </div>
+          </div>
+          
+          <div class="space-y-3">
+            <a href="/matikan" class="group flex items-center p-3 bg-gradient-to-r from-red-50 to-red-100 rounded-lg border border-red-200 hover:from-red-100 hover:to-red-200 transition-all duration-300">
+              <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-600 transition-colors">
+                <i class="fas fa-power-off text-white text-xs"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-red-900 group-hover:text-red-800 text-sm">Turn Off Website</p>
+                <p class="text-xs text-red-700">Shutdown system completely</p>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="card-purple p-6 rounded-xl shadow-md border border-gray-100 p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-white">Statistics</h3>
+            <div class="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-chart-bar text-purple-600 text-xs"></i>
+            </div>
+          </div>
+          
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-file-alt text-blue-600 text-xs"></i>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">Total Reports</p>
+                  <p class="text-xs text-gray-600">This month</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-lg font-bold text-gray-800">156</p>
+                <p class="text-xs text-green-600">+12%</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-check-circle text-green-600 text-xs"></i>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">Completed</p>
+                  <p class="text-xs text-gray-600">This month</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-lg font-bold text-gray-800">142</p>
+                <p class="text-xs text-green-600">91%</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-clock text-yellow-600 text-xs"></i>
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-800 text-sm">Pending</p>
+                  <p class="text-xs text-gray-600">This month</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-lg font-bold text-gray-800">14</p>
+                <p class="text-xs text-yellow-600">9%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="card-purple p-6 rounded-xl shadow-md border border-gray-100 p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-white">System Health</h3>
+            <div class="w-6 h-6 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-heartbeat text-emerald-600 text-xs"></i>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-3 text-center">
+            <div class="p-2 rounded-lg bg-gray-50">
+              <div class="w-10 h-10 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-database text-green-600"></i>
+              </div>
+              <p class="mt-2 text-sm font-semibold text-gray-700">Database</p>
+              <span class="text-xs text-green-600 font-bold">Normal</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-50">
+              <div class="w-10 h-10 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-server text-green-600"></i>
+              </div>
+              <p class="mt-2 text-sm font-semibold text-gray-700">Server</p>
+              <span class="text-xs text-green-600 font-bold">Normal</span>
+            </div>
+            <div class="p-2 rounded-lg bg-gray-50">
+              <div class="w-10 h-10 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-network-wired text-green-600"></i>
+              </div>
+              <p class="mt-2 text-sm font-semibold text-gray-700">Network</p>
+              <span class="text-xs text-green-600 font-bold">Normal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<style>
+  .lab-card-container[data-theme="blue"] {
+    @apply bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200;
+  }
+  .lab-card-container[data-theme="blue"]:hover {
+    @apply from-blue-100 to-blue-200;
+  }
+  .lab-card-container[data-theme="blue"] .lab-icon { @apply bg-blue-500; }
+  .lab-card-container[data-theme="blue"]:hover .lab-icon { @apply bg-blue-600; }
+  .lab-card-container[data-theme="blue"] .lab-title { @apply text-blue-900; }
+  .lab-card-container[data-theme="blue"]:hover .lab-title { @apply text-blue-800; }
+  .lab-card-container[data-theme="blue"] .lab-description { @apply text-blue-700; }
+  .lab-card-container[data-theme="blue"] .lab-dosen { @apply text-blue-600; }
+
+  .lab-card-container[data-theme="green"] {
+    @apply bg-gradient-to-br from-green-50 to-green-100 border-green-200;
+  }
+  .lab-card-container[data-theme="green"]:hover {
+    @apply from-green-100 to-green-200;
+  }
+  .lab-card-container[data-theme="green"] .lab-icon { @apply bg-green-500; }
+  .lab-card-container[data-theme="green"]:hover .lab-icon { @apply bg-green-600; }
+  .lab-card-container[data-theme="green"] .lab-title { @apply text-green-900; }
+  .lab-card-container[data-theme="green"]:hover .lab-title { @apply text-green-800; }
+  .lab-card-container[data-theme="green"] .lab-description { @apply text-green-700; }
+  .lab-card-container[data-theme="green"] .lab-dosen { @apply text-green-600; }
+
+  .lab-card-container[data-theme="purple"] {
+    @apply bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200;
+  }
+  .lab-card-container[data-theme="purple"]:hover {
+    @apply from-purple-100 to-purple-200;
+  }
+  .lab-card-container[data-theme="purple"] .lab-icon { @apply bg-purple-500; }
+  .lab-card-container[data-theme="purple"]:hover .lab-icon { @apply bg-purple-600; }
+  .lab-card-container[data-theme="purple"] .lab-title { @apply text-purple-900; }
+  .lab-card-container[data-theme="purple"]:hover .lab-title { @apply text-purple-800; }
+  .lab-card-container[data-theme="purple"] .lab-description { @apply text-purple-700; }
+  .lab-card-container[data-theme="purple"] .lab-dosen { @apply text-purple-600; }
+  
+  .lab-card-container[data-theme="orange"] {
+    @apply bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200;
+  }
+  .lab-card-container[data-theme="orange"]:hover {
+    @apply from-orange-100 to-orange-200;
+  }
+  .lab-card-container[data-theme="orange"] .lab-icon { @apply bg-orange-500; }
+  .lab-card-container[data-theme="orange"]:hover .lab-icon { @apply bg-orange-600; }
+  .lab-card-container[data-theme="orange"] .lab-title { @apply text-orange-900; }
+  .lab-card-container[data-theme="orange"]:hover .lab-title { @apply text-orange-800; }
+  .lab-card-container[data-theme="orange"] .lab-description { @apply text-orange-700; }
+  .lab-card-container[data-theme="orange"] .lab-dosen { @apply text-orange-600; }
+
+  .lab-card-container[data-theme="gray"] {
+    @apply bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200;
+  }
+  .lab-card-container[data-theme="gray"]:hover {
+    @apply from-gray-100 to-gray-200;
+  }
+  .lab-card-container[data-theme="gray"] .lab-icon { @apply bg-gray-500; }
+  .lab-card-container[data-theme="gray"]:hover .lab-icon { @apply bg-gray-600; }
+  .lab-card-container[data-theme="gray"] .lab-title { @apply text-gray-900; }
+  .lab-card-container[data-theme="gray"]:hover .lab-title { @apply text-gray-800; }
+  .lab-card-container[data-theme="gray"] .lab-description { @apply text-gray-700; }
+  .lab-card-container[data-theme="gray"] .lab-dosen { @apply text-gray-600; }
+</style>
+
+<script>
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('fade-in');
+  initDateTime();
+});
+
+
+const links = document.querySelectorAll('a');
+links.forEach(link => {
+  link.addEventListener('click', function(e) {
+    if (this.hostname === window.location.hostname && !this.hasAttribute('target')) {
+      e.preventDefault();
+      document.body.classList.remove('fade-in');
+      setTimeout(() => {
+        window.location = this.href;
+      }, 300);
+    }
+  });
+});
+
+
+function initDateTime() {
+  const dateTimeElement = document.getElementById('currentTime');
+  const dateElement = document.getElementById('currentDate');
+  
+  function updateDateTime() {
+    const now = new Date();
+    const timeOptions = { 
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    const dateOptions = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric'
+    };
+    
+    dateTimeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
+    dateElement.textContent = now.toLocaleDateString('en-US', dateOptions);
+  }
+  
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+}
+
+
+function logout() {
+  if (confirm('Are you sure you want to logout?')) {
+
+    localStorage.removeItem('adminSession');
+    sessionStorage.clear();
+    
+
+    window.location.href = '/logout';
+  }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  const cards = document.querySelectorAll('.group');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  });
+
+  cards.forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(card);
+  });
+});
+
+
+function showToast(message, type = 'info') {
+
+  const toast = document.createElement('div');
+  toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold transform translate-x-full transition-transform duration-300 ${
+    type === 'success' ? 'bg-green-500' : 
+    type === 'error' ? 'bg-red-500' : 
+    'bg-blue-500'
+  }`;
+  toast.textContent = message;
+  
+  document.body.appendChild(toast);
+  
+
+  setTimeout(() => {
+    toast.classList.remove('translate-x-full');
+  }, 100);
+  
+
+  setTimeout(() => {
+    toast.classList.add('translate-x-full');
+    setTimeout(() => {
+      document.body.removeChild(toast);
+    }, 300);
+  }, 3000);
+}
+</script>
+</body>
+</html> 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <style>
+      .modal { display: none; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-violet-700 to-purple-500 font-sans">
+    <div class="flex min-h-screen justify-center items-center py-10 px-4">
+        <div class="bg-white/10 backdrop-blur-md text-white p-8 rounded-2xl shadow-lg max-w-5xl w-full">
+            <div class="w-full mb-6">
+                <a href="/home" class="inline-flex items-center gap-2 text-white/80 hover:text-white font-semibold text-sm transition-colors">
+                    <i class="fas fa-arrow-left"></i>
+                    Kembali ke Dashboard
+                </a>
+            </div>
+            <h2 class="text-3xl font-bold mb-8 text-center">Pilih Praktikum & Masuk Kelas</h2>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+              <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg relative mb-6" role="alert">
+                <strong class="font-bold">Gagal!</strong>
+                <span class="block sm:inline"><%= error %></span>
+              </div>
+            <% } %>
+
+            <div class="space-y-8">
+                <% labsWithPraktikums.forEach(lab => { %>
+                    <% if (lab.praktikum.length > 0) { %>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4 border-b-2 border-white/20 pb-2 flex items-center gap-3">
+                                <i class="fas fa-flask"></i> <%= lab.nama_lab %>
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <% lab.praktikum.forEach((praktikum) => { %>
+                                    <div class="bg-white p-6 rounded-xl shadow-lg text-center flex flex-col">
+                                        <h4 class="text-xl font-semibold mb-4 text-purple-800"><%= praktikum.nama_praktikum %></h4>
+                                        
+                                        <% if (enrolledIds.has(praktikum.id)) { %>
+                                            <div class="mt-auto w-full">
+                                                <a href="/home?praktikumId=<%= praktikum.id %>" class="block bg-green-100 text-green-800 font-bold px-6 py-2 rounded-md hover:bg-green-200 transition-colors">
+                                                    <i class="fas fa-arrow-right-to-bracket mr-2"></i> Masuk Kelas
+                                                </a>
+                                            </div>
+                                        <% } else { %>
+                                            <button onclick="openModal(<%= praktikum.id %>)" class="block bg-purple-700 text-white px-6 py-2 rounded-md mt-auto w-full shadow-md hover:bg-purple-800 transition">
+                                                Gabung Kelas
+                                            </button>
+                                        <% } %>
+                                        </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }); %>
+            </div>
+
+            <% if (!labsWithPraktikums || labsWithPraktikums.every(l => l.praktikum.length === 0)) { %>
+                <p class="col-span-full text-center text-gray-200 py-10">Tidak ada praktikum yang tersedia saat ini.</p>
+            <% } %>
+
+        </div>
+    </div>
+
+    <% if (labsWithPraktikums) { %>
+        <% labsWithPraktikums.forEach(lab => { %>
+            <% lab.praktikum.forEach(praktikum => { %>
+                <div id="modal-<%= praktikum.id %>" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
+                  <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md relative">
+                    <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl" onclick="closeModal(<%= praktikum.id %>)">&times;</button>
+                    <h2 class="text-center text-xl font-semibold mb-4 text-gray-800">Masukkan Kode Masuk untuk<br><span class="font-bold text-purple-700"><%= praktikum.nama_praktikum %></span></h2>
+                    <form action="/pilihLab/joinLab" method="POST">
+                      <input type="hidden" name="praktikumId" value="<%= praktikum.id %>" />
+                      <input type="text" name="kodeMasuk" class="mt-2 px-4 py-2 border border-gray-300 rounded-md w-full text-gray-700 focus:ring-2 focus:ring-purple-500" placeholder="Masukkan Kode Masuk" required />
+                      <button type="submit" class="bg-purple-700 text-white px-6 py-2 rounded-md mt-4 w-full shadow-md hover:bg-purple-800 transition">Gabung Kelas</button>
+                    </form>
+                  </div>
+                </div>
+            <% }); %>
+        <% }); %>
+    <% } %>
+
+    <script>
+      function openModal(id) { document.getElementById('modal-' + id).style.display = 'flex'; }
+      function closeModal(id) { document.getElementById('modal-' + id).style.display = 'none'; }
+      window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+          event.target.style.display = "none";
+        }
+      }
+    </script>
+</body>
+</html>

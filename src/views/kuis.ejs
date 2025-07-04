@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title><%= title %></title>
+    <style>
+        .modal { display: none; }
+        .modal.active { display: flex; }
+    </style>
+</head>
+<body class="bg-purple-50">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { praktikum: praktikum }) %>
+
+        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Kuis Praktikum</h1>
+                    <p class="text-gray-500">Praktikum: <%= praktikum.nama_praktikum %></p>
+                </div>
+                <a href="/praktikum/<%= praktikum.id %>/kuis/baru" class="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition duration-300">
+                    <i class="fa-solid fa-plus mr-2"></i>Tambah Kuis
+                </a>
+            </header>
+
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <table class="min-w-full leading-normal">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Judul</th>
+                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jadwal</th>
+                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kuis Selesai</th>
+                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nilai</th>
+                            <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <% if (kuisList.length > 0) { %>
+                            <% kuisList.forEach(kuis => { %>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-5 py-4 text-sm font-semibold text-gray-800"><%= kuis.judul %></td>
+                                    <td class="px-5 py-4 text-sm"><%= new Date(kuis.waktu_mulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %></td>
+                                    <td class="px-5 py-4 text-sm">
+                                        <form action="/kuis/<%= kuis.id %>/toggle-status" method="POST" class="inline">
+                                            <button type="submit" class="cursor-pointer">
+                                                <%= kuis.status === 'aktif' ? 'Aktif' : 'Tidak Aktif' %>
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td class="px-5 py-4 text-sm"><%= kuis._count.jawaban_kuis %> / <%= totalMahasiswa %></td>
+                                    <td class="px-5 py-4 text-sm">
+                                        <a href="/kuis/<%= kuis.id %>/nilai" class="text-purple-600 hover:text-purple-900 font-semibold">Lihat Nilai</a>
+                                    </td>
+                                    <td class="px-5 py-4 text-sm flex space-x-4">
+                                        <div class="flex items-center justify-end space-x-2">
+                                            <a href="/kuis/<%= kuis.id %>/daftar-soal" class="text-green-600 hover:text-green-900" title="Lihat Soal">
+                                                <i class="fas fa-list-ol"></i>
+                                            </a>
+                                            <a href="/kuis/<%= kuis.id %>/edit" class="text-blue-600 hover:text-blue-900" title="Edit Kuis">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                        <form action="/kuis/<%= kuis.id %>/delete" method="POST" class="delete-form">
+                                            <button type="submit" class="text-red-600 hover:text-red-900" title="Hapus Kuis">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="text-center py-10 text-gray-500">Belum ada kuis yang dibuat.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.delete-form').forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: 'Anda yakin ingin menghapus kuis ini?',
+                        text: "Semua soal dan jawaban yang terkait akan dihapus permanen!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#6D28D9',
+                        cancelButtonColor: '#6B7280',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then(result => {
+                        if (result.isConfirmed) form.submit();
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

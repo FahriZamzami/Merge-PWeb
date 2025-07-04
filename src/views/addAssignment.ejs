@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Penugasan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-[#F9F5FF]">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { praktikum }) %>
+
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            <header class="flex items-center justify-between py-3 px-6 bg-white shadow-sm sticky top-0 z-20">
+                <h2 class="text-xl font-semibold text-gray-800">LABCORNER</h2>
+                <div class="flex items-center space-x-5">
+                    <img src="https://i.ibb.co/68q746Z/logo-web.png" alt="Logo" class="h-8 w-8 rounded-full">
+                    <button class="text-gray-500 relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    </button>
+                    <div class="relative">
+                        <img class="h-9 w-9 rounded-full" src="https://i.ibb.co/6n20s3v/4215763.png" alt="User profile">
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 p-8">
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-6">Tambah Penugasan</h2>
+                    <div class="bg-[#F3E8FF] rounded-xl p-8">
+                        <form action="/assignments/add" method="POST" enctype="multipart/form-data">
+                            <div class="mb-5">
+                                <label class="block text-gray-800 text-sm font-semibold mb-2" for="judul">Judul</label>
+                                <input name="judul" id="judul" class="appearance-none bg-white border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500" type="text" required>
+                            </div>
+
+                            <div class="mb-5">
+                                <label class="block text-gray-800 text-sm font-semibold mb-2" for="deskripsi">Deskripsi</label>
+                                <textarea name="deskripsi" id="deskripsi" rows="4" class="appearance-none bg-white border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-gray-800 text-sm font-semibold mb-2">File Penugasan</label>
+                                <label for="fileTugas" class="cursor-pointer inline-flex items-center gap-3 bg-purple-100 border border-purple-300 rounded-lg px-4 py-3 hover:bg-purple-200 transition-colors">
+                                    <svg class="h-6 w-6 text-purple-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <span id="fileLabel" class="text-purple-800 font-medium">Impor dari Penyimpanan Lokal</span>
+                                </label>
+                                <input name="fileTugas" id="fileTugas" type="file" class="hidden">
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-6">
+                                <div>
+                                    <label class="block text-gray-800 text-sm font-semibold mb-2">Tenggat Waktu</label>
+                                    <div class="flex space-x-2">
+                                        <input type="text" onfocus="(this.type='date')" onblur="(this.type='text')" name="tanggal" placeholder="dd/mm/yyyy" class="bg-white border border-gray-300 rounded-lg px-3 py-3 w-full focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-gray-500" required>
+                                        <input type="time" name="jam" class="bg-white border border-gray-300 rounded-lg px-3 py-3 w-32 focus:outline-none focus:ring-2 focus:ring-purple-500" value="23:59" required>
+                                    </div>
+                                </div>
+                                <div class="flex items-end mt-4 md:mt-0 pb-1">
+                                        <label class="inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="otomatis" class="form-checkbox h-5 w-5 rounded text-purple-600 border-gray-400 focus:ring-purple-500">
+                                        <span class="ml-3 text-gray-700">Otomatis Tutup Penugasan</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-end space-x-4 mt-8">
+                                <button class="bg-[#EBEBEB] hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-lg border border-gray-300" type="submit">Simpan</button>
+                                <a href="/assignments" class="bg-[#A855F7] hover:bg-[#9333ea] text-white font-semibold py-2 px-6 rounded-lg" type="button">Batal</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('fileTugas').addEventListener('change', function () {
+            const fileName = this.files[0]?.name || "Impor dari Penyimpanan Lokal";
+            document.getElementById('fileLabel').textContent = `${fileName}`;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .table-row-hover:hover { background-color: #f8fafc; transform: scale(1.01); transition: all 0.2s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 font-sans min-h-screen">
+    <div class="flex h-screen">
+        <%- include('partials/sidebarMahasiswa', { currentPage: 'rekapNilai', praktikum: praktikum, user: user }) %>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="gradient-bg text-white shadow-xl">
+                <div class="px-8 py-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full">
+                                <i class="fas fa-chart-line text-3xl"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-3xl font-bold">Rekap Nilai Praktikum</h1>
+                                <p class="text-lg opacity-90">Perkembangan nilai Anda di kelas <%= praktikum.nama_praktikum %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border-4 border-purple-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-6">
+                            <div class="p-4 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-600 text-white">
+                                <i class="fas fa-user-graduate text-3xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900 mb-2"><%= namaMahasiswa %></h2>
+                                <p class="text-lg text-gray-600">Mahasiswa Aktif</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-4xl font-bold text-purple-600 mb-2"><%= nilaiRataRata %></div>
+                            <div class="text-lg text-gray-600">Nilai Rata-rata</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 card-hover border-4 border-blue-100">
+                        <div class="flex items-center">
+                            <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-white mr-6">
+                                <i class="fas fa-tasks text-3xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-lg font-medium text-gray-600 mb-2">Tugas Dikumpul</p>
+                                <p class="text-4xl font-bold text-gray-900"><%= rekapNilai.length %></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-xl p-8 card-hover border-4 border-green-100">
+                        <div class="flex items-center">
+                            <div class="p-4 rounded-2xl bg-gradient-to-br from-green-400 to-green-600 text-white mr-6">
+                                <i class="fas fa-check-circle text-3xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-lg font-medium text-gray-600 mb-2">Tugas Dinilai</p>
+                                <p class="text-4xl font-bold text-gray-900"><%= jumlahTugas %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800"><i class="fas fa-table mr-3 text-purple-600"></i>Daftar Nilai Tugas</h2>
+                    </div>
+                    <a href="/rekap-nilai-mahasiswa/pdf" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-bold text-lg flex items-center space-x-3 shadow-lg transition-transform hover:scale-105">
+                        <i class="fas fa-file-pdf text-xl"></i>
+                        <span>Ekstrak PDF</span>
+                    </a>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-4 border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="gradient-bg text-white">
+                                <tr>
+                                    <th class="px-8 py-4 text-center font-bold text-md">No</th>
+                                    <th class="px-8 py-4 text-left font-bold text-md">Judul Tugas</th>
+                                    <th class="px-8 py-4 text-center font-bold text-md">Nilai</th>
+                                    <th class="px-8 py-4 text-left font-bold text-md">Waktu Pengumpulan</th>
+                                    <th class="px-8 py-4 text-center font-bold text-md">Dokumen</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <% if (rekapNilai.length === 0) { %>
+                                    <tr>
+                                        <td colspan="5" class="px-8 py-12 text-center text-gray-500">
+                                            <p class="text-lg">Belum ada data pengumpulan tugas.</p>
+                                        </td>
+                                    </tr>
+                                <% } else { %>
+                                    <% rekapNilai.forEach((item, index) => { %>
+                                        <tr class="table-row-hover">
+                                            <td class="px-8 py-4 text-center font-semibold text-gray-600"><%= index + 1 %></td>
+                                            <td class="px-8 py-4 text-lg font-semibold text-gray-800"><%= item.tugas.judul %></td>
+                                            <td class="px-8 py-4 text-center">
+                                                <% if (item.nilai !== null) { %>
+                                                    <span class="text-2xl font-bold <%= item.nilai >= 80 ? 'text-green-600' : 'text-red-600' %>"><%= item.nilai %></span>
+                                                <% } else { %>
+                                                    <span class="text-gray-400"> - </span>
+                                                <% } %>
+                                            </td>
+                                            <td class="px-8 py-4 text-gray-600"><%= item.waktu_kirim_formatted %></td>
+                                            <td class="px-8 py-4 text-center">
+                                                <a href="/uploads/<%= item.file_path %>" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline">
+                                                    Lihat File
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

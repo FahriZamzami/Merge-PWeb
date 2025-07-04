@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Pengumpulan - LABCORNER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-[#F9F5FF]">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { praktikum }) %>
+
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            <main class="flex-1 p-10">
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex border-b-2 border-gray-200 space-x-2">
+                            <a href="/assignments/<%= assignment.id %>/pengumpulan" 
+                                class="px-6 py-2 text-lg font-bold border-b-4 
+                                <%= activeTab === 'pengumpul' ? 'text-purple-700 border-purple-700' : 'text-gray-500 border-transparent hover:text-purple-700' %>">
+                                Pengumpul
+                            </a>
+                            <a href="/assignments/<%= assignment.id %>/files" 
+                                class="px-6 py-2 text-lg font-bold border-b-4 
+                                <%= activeTab === 'file' ? 'text-purple-700 border-purple-700' : 'text-gray-500 border-transparent hover:text-purple-700' %>">
+                                File
+                            </a>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-700"><%= assignment.judul %></h2>
+                    </div>
+
+                    <div class="mt-6 text-left">
+                        <a href="/penugasan/detail/<%= assignment.id %>" class="text-purple-600 hover:underline font-medium">
+                            ← Kembali
+                        </a>
+                    </div>
+
+                    <div class="bg-[#F3E8FF] rounded-xl p-6">
+                        <div class="relative mb-4">
+                            <input type="text" id="searchInput" placeholder="Cari Laporan"
+                                class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3" id="fileList">
+                            <% if (submissions && submissions.length > 0) { %>
+                                <% submissions.forEach(sub => { %>
+                                    <% const submissionDate = new Date(sub.dikumpulkan_pada); %>
+                                    <% const hari = submissionDate.toLocaleDateString('id-ID', { weekday: 'long' }); %>
+                                    <% const tanggal = submissionDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); %>
+                                    <% const jam = submissionDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace('.', ':'); %>
+
+                                    <div class="file-item bg-white p-4 rounded-xl shadow-sm flex items-center justify-between hover:shadow-md transition-shadow"
+                                        data-filename="<%= sub.nama_file %>">
+                                        <div class="flex items-center gap-4">
+                                            <div class="text-red-500">
+                                                <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd"
+                                                        d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                                                        clip-rule="evenodd"></path>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-gray-800"><%= sub.nama_file %></p>
+                                                <p class="text-sm text-gray-500"><%= hari %>, <%= tanggal %> &nbsp; <%= jam %></p>
+                                            </div>
+                                        </div>
+                                        <a href="/uploads/<%= sub.path_file %>" download
+                                            class="text-purple-600 hover:text-purple-800 p-2 rounded-full hover:bg-purple-100">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="text-center py-12">
+                                    <p class="text-gray-500">Belum ada file yang dikumpulkan.</p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const searchInput = document.querySelector("input[placeholder='Cari Laporan']");
+            const fileItems = document.querySelectorAll(".file-item");
+
+            searchInput.addEventListener("input", () => {
+                const query = searchInput.value.toLowerCase();
+
+                fileItems.forEach(item => {
+                    const filename = item.dataset.filename.toLowerCase();
+                    if (filename.includes(query)) {
+                        item.style.display = "flex";
+                    } else {
+                        item.style.display = "none";
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

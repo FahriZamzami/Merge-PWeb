@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kelas - Labcorner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 154, 158, 0.4);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 222, 128, 0.4);
+        }
+        .search-container {
+            position: relative;
+        }
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 50;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 font-sans min-h-screen">
+    <header class="gradient-bg text-white shadow-xl">
+        <div class="px-8 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 bg-white bg-opacity-20 rounded-full">
+                        <i class="fas fa-graduation-cap text-3xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold">Dashboard Kelas</h1>
+                        <p class="text-lg opacity-90">Selamat datang, <%= currentUser.username %></p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="confirmLogout()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-8 py-8">
+        <div class="mb-8">
+        <div class="mb-8">
+            <div class="search-container">
+                <div class="relative">
+                    <input type="text" 
+                        id="searchKelas" 
+                        placeholder="Cari kelas praktikum..." 
+                        class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-purple-500 focus:outline-none shadow-lg">
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
+                        <i class="fas fa-search text-gray-400 text-xl"></i>
+                    </div>
+                </div>
+                <div id="searchResults" class="search-results hidden"></div>
+            </div>
+        </div>
+
+        <div id="kelasData" 
+            data-semua-kelas='<%- JSON.stringify(semuaKelas) %>'
+            style="display: none;">        </div>
+
+        <div class="mb-12">
+            <div class="flex items-center mb-6">
+                <div class="p-3 bg-purple-100 rounded-full mr-4">
+                    <i class="fas fa-lock text-2xl text-purple-600"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Semua Kelas Praktikum</h2>
+            </div>
+            
+            <% if (semuaKelas.length === 0) { %>
+                <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-6">
+                        <i class="fas fa-inbox text-3xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">Tidak ada kelas tersedia</h3>
+                    <p class="text-gray-500">Belum ada kelas praktikum yang dibuat</p>
+                </div>
+            <% } else { %>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <% semuaKelas.forEach(kelas => { %>
+                        <div class="bg-white rounded-2xl shadow-xl p-6 card-hover border-2 <%= kelas.sudahTerdaftar ? 'border-green-100' : 'border-purple-100' %>">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 <%= kelas.sudahTerdaftar ? 'bg-green-100' : 'bg-purple-100' %> rounded-full">
+                                    <i class="fas <%= kelas.sudahTerdaftar ? 'fa-check-circle' : 'fa-lock' %> text-xl <%= kelas.sudahTerdaftar ? 'text-green-600' : 'text-purple-600' %>"></i>
+                                </div>
+                                <span class="<%= kelas.sudahTerdaftar ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800' %> px-3 py-1 rounded-full text-sm font-semibold">
+                                    <%= kelas.sudahTerdaftar ? 'Terdaftar' : 'Terkunci' %>
+                                </span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2"><%= kelas.nama_praktikum %></h3>
+                            <p class="text-gray-600 mb-4"><%= kelas.lab.nama_lab %></p>
+                            <p class="text-sm text-gray-500 mb-4">
+                                Kode Akses: <span class="font-mono bg-gray-100 px-2 py-1 rounded"><%= kelas.kode_masuk %></span>
+                            </p>
+                            
+                            <% if (kelas.sudahTerdaftar) { %>
+                                <button data-praktikum-id="<%= kelas.id %>" 
+                                        class="btn-masuk-terdaftar w-full btn-success text-white py-3 px-6 rounded-xl font-semibold">
+                                    <i class="fas fa-sign-in-alt mr-2"></i>Masuk Kelas
+                                </button>
+                            <% } else { %>
+                                <button data-nama-kelas="<%= kelas.nama_praktikum %>" 
+                                        data-kode-akses="<%= kelas.kode_masuk %>"
+                                        class="btn-masuk-kode w-full btn-secondary text-white py-3 px-6 rounded-xl font-semibold">
+                                    <i class="fas fa-key mr-2"></i>Masuk dengan Kode
+                                </button>
+                            <% } %>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <div id="kodeMasukModal" class="modal">
+        <div class="modal-content">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-purple-100 mb-6">
+                    <i class="fas fa-key text-3xl text-purple-600"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4" id="modalKelasTitle">Masuk Kelas</h3>
+                <p class="text-gray-600 mb-6">
+                    Masukkan kode akses untuk bergabung dengan kelas ini.
+                    <br><br>
+                    <strong>Kode Akses:</strong> <span id="modalKodeAkses" class="font-mono bg-gray-100 px-3 py-2 rounded-lg text-lg"></span>
+                </p>
+                
+                <div class="mb-6">
+                    <input type="text" 
+                        id="inputKodeMasuk" 
+                        placeholder="Masukkan kode akses..." 
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none text-center text-lg font-mono">
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button onclick="closeKodeMasukModal()" 
+                            class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-xl transition-colors">
+                        Batal
+                    </button>
+                    <button onclick="submitKodeMasuk()" 
+                            class="flex-1 btn-primary text-white font-bold py-3 px-6 rounded-xl">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Masuk
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
+                    <i class="fas fa-sign-out-alt text-3xl text-red-600"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Konfirmasi Logout</h3>
+                <p class="text-gray-600 mb-6">Apakah Anda yakin ingin keluar dari sistem?</p>
+                <div class="flex space-x-4">
+                    <button onclick="closeLogoutModal()" 
+                            class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-xl transition-colors">
+                        Batal
+                    </button>
+                    <a href="/logout" 
+                        class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl transition-colors inline-block text-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const semuaKelas = JSON.parse(document.getElementById('kelasData').dataset.semuaKelas);
+        let currentKodeMasuk = '';
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            document.querySelectorAll('.btn-masuk-terdaftar').forEach(button => {
+                button.addEventListener('click', function() {
+                    const praktikumId = this.getAttribute('data-praktikum-id');
+                    masukKelasTerdaftar(praktikumId);
+                });
+            });
+
+
+            document.querySelectorAll('.btn-masuk-kode').forEach(button => {
+                button.addEventListener('click', function() {
+                    const namaKelas = this.getAttribute('data-nama-kelas');
+                    const kodeAkses = this.getAttribute('data-kode-akses');
+                    showKodeMasukModal(namaKelas, kodeAkses);
+                });
+            });
+        });
+
+
+        document.getElementById('searchKelas').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.card-hover');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const lab = card.querySelector('p').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || lab.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+
+        function showKodeMasukModal(namaKelas, kodeAkses) {
+            currentKodeMasuk = kodeAkses;
+            document.getElementById('modalKelasTitle').textContent = `Masuk ${namaKelas}`;
+            document.getElementById('modalKodeAkses').textContent = kodeAkses;
+            document.getElementById('inputKodeMasuk').value = '';
+            document.getElementById('kodeMasukModal').style.display = 'block';
+        }
+
+        function closeKodeMasukModal() {
+            document.getElementById('kodeMasukModal').style.display = 'none';
+        }
+
+        function submitKodeMasuk() {
+            const inputKode = document.getElementById('inputKodeMasuk').value.trim();
+            
+            if (inputKode === currentKodeMasuk) {
+
+                fetch('/dashboard-kelas/masuk', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        kodeMasuk: inputKode
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirectUrl || '/home';
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat masuk kelas.');
+                });
+            } else {
+                alert('Kode akses tidak valid!');
+            }
+        }
+
+
+        function masukKelasTerdaftar(praktikumId) {
+            fetch(`/dashboard-kelas/masuk-terdaftar/${praktikumId}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+
+                    window.location.href = '/home';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat masuk kelas.');
+            });
+        }
+
+
+        function confirmLogout() {
+            document.getElementById('logoutModal').style.display = 'block';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+
+
+        window.onclick = function(event) {
+            const kodeModal = document.getElementById('kodeMasukModal');
+            const logoutModal = document.getElementById('logoutModal');
+            
+            if (event.target === kodeModal) {
+                closeKodeMasukModal();
+            }
+            if (event.target === logoutModal) {
+                closeLogoutModal();
+            }
+        }
+
+
+        document.getElementById('inputKodeMasuk').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitKodeMasuk();
+            }
+        });
+    </script>
+</body>
+</html> 

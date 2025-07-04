@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Penugasan - LABCORNER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#F9F5FF]">
+<div class="flex h-screen">
+    <%- include('partials/sidebar', { praktikum }) %>
+
+    <div class="flex-1 flex flex-col overflow-y-auto">
+        <main class="flex-1 p-10">
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">Edit Penugasan</h2>
+                <div class="bg-[#F3E8FF] rounded-xl p-8">
+                    <% if (assignment) { %>
+                    <form action="/penugasan/edit/<%= assignment.id %>" method="POST" enctype="multipart/form-data">
+                        <div class="mb-5">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="judul">Judul</label>
+                            <input name="judul" id="judul" class="border border-gray-300 rounded-lg w-full py-3 px-4" type="text" value="<%= assignment.judul %>" required>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="deskripsi">Deskripsi</label>
+                            <textarea name="deskripsi" id="deskripsi" rows="4" class="border border-gray-300 rounded-lg w-full py-3 px-4"><%= assignment.deskripsi %></textarea>
+                        </div>
+
+                        <div class="mb-8">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">File Tugas</label>
+                            <div class="flex items-center gap-4">
+                                <!-- FIX: Container for file display now has a consistent ID -->
+                                <div id="file-display-area" class="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-3 flex items-center justify-between min-h-[50px]">
+                                    <!-- This content will be managed by JavaScript -->
+                                </div>
+                                <label for="fileTugas" class="cursor-pointer bg-purple-200 text-purple-700 p-3 rounded-lg hover:bg-purple-300 transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                </label>
+                                <input name="fileTugas" id="fileTugas" type="file" class="hidden">
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="hapusFile" id="hapusFile" value="false">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-6 mb-5">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Tenggat Waktu</label>
+                                <div class="flex space-x-2">
+                                    <% const deadline = new Date(assignment.batas_waktu); %>
+                                    <% const tgl = deadline.toISOString().split('T')[0]; %>
+                                    <% const jam = deadline.toTimeString().substring(0,5); %>
+                                    <input type="date" name="tanggal" class="border border-gray-300 rounded-lg px-3 py-3 w-full" value="<%= tgl %>" required>
+                                    <input type="time" name="jam" class="border border-gray-300 rounded-lg px-3 py-3 w-32" value="<%= jam %>" required>
+                                </div>
+                            </div>
+                            <div class="flex items-end mt-4 md:mt-0">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="otomatis" class="form-checkbox h-5 w-5 rounded text-purple-600 border-gray-400" <%= assignment.tutup_penugasan ? 'checked' : '' %>>
+                                    <span class="ml-3 text-gray-700">Otomatis Tutup Penugasan</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-10">
+                            <button type="button" onclick="hapusTugas()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg transition-colors">Hapus Tugas</button>
+
+                            <div class="flex items-center gap-4">
+                                <a href="/assignments" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg transition-colors">Batal</a>
+                                <button type="submit" class="bg-[#A855F7] hover:bg-[#9333ea] text-white font-bold py-2 px-6 rounded-lg transition-colors">Simpan Perubahan</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <form id="deleteForm" action="/assignments/delete/<%= assignment.id %>" method="POST" style="display: none;"></form>
+
+                    <% } else { %>
+                        <p class="text-center text-gray-600">Penugasan tidak ditemukan.</p>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div id="modalHapus" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Hapus</h2>
+        <p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus penugasan ini? Tindakan ini tidak dapat dibatalkan.</p>
+        <div class="flex justify-end gap-4">
+            <button onclick="tutupModal()" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800">Batal</button>
+            <button onclick="konfirmasiHapus()" class="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('fileTugas');
+        const fileDisplayArea = document.getElementById('file-display-area');
+        const hapusFileInput = document.getElementById('hapusFile');
+        const initialFile = "<%= assignment.fileTugas || '' %>";
+
+
+        function renderFileDisplay(fileName, isNew = false) {
+            if (fileName) {
+                if (isNew) {
+
+                    fileDisplayArea.innerHTML = `<span class="text-gray-900 font-semibold truncate pr-4">${fileName}</span>`;
+                } else {
+
+                    fileDisplayArea.innerHTML = `
+                        <a href="/uploads/${fileName}" target="_blank" class="text-blue-600 hover:underline truncate pr-4">${fileName}</a>
+                        <button type="button" class="text-red-500 hover:text-red-700 font-bold flex-shrink-0" onclick="hapusFileTugas()">Hapus</button>
+                    `;
+                }
+            } else {
+
+                fileDisplayArea.innerHTML = '<span class="text-gray-500">Tidak ada file terunggah</span>';
+            }
+        }
+
+
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+
+                renderFileDisplay(this.files[0].name, true);
+
+                hapusFileInput.value = "false";
+            }
+        });
+
+
+        renderFileDisplay(initialFile);
+    });
+
+
+    function hapusFileTugas() {
+        if (confirm('Yakin ingin menghapus file ini? Perubahan akan diterapkan setelah Anda menekan "Simpan".')) {
+            const hapusFileInput = document.getElementById('hapusFile');
+            const fileInput = document.getElementById('fileTugas');
+            const fileDisplayArea = document.getElementById('file-display-area');
+            
+
+            hapusFileInput.value = "true";
+
+            fileInput.value = "";
+
+            fileDisplayArea.innerHTML = '<span class="text-red-500 font-semibold">File akan dihapus saat disimpan.</span>';
+        }
+    }
+
+
+    function hapusTugas() {
+        document.getElementById('modalHapus').classList.remove('hidden');
+    }
+
+    function tutupModal() {
+        document.getElementById('modalHapus').classList.add('hidden');
+    }
+
+    function konfirmasiHapus() {
+        document.getElementById('deleteForm').submit();
+    }
+</script>
+</body>
+</html>

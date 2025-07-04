@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title><%= title %></title>
+</head>
+<body class="bg-slate-50">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { currentPath: currentPath, praktikum: praktikum }) %>
+
+        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            
+            <div class="max-w-7xl mx-auto">
+
+                <div class="bg-gradient-to-br from-violet-700 to-purple-400 p-6 sm:p-8 rounded-2xl shadow-lg">
+
+                    <header class="flex flex-wrap gap-4 justify-between items-center mb-8">
+                        <div>
+                            <h1 class="text-4xl font-extrabold text-white tracking-tight">Daftar Mahasiswa</h1>
+                            <p class="text-purple-200 mt-1">Praktikum: <%= praktikum.nama_praktikum %></p>
+                        </div>
+                        <div class="flex items-center space-x-2 sm:space-x-3">
+                            <a href="/praktikum/<%= praktikum.id %>/mahasiswa/excel" class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-white/20 transition">
+                                <i class="fa-solid fa-file-excel w-4 h-4"></i>
+                                <span>Export Excel</span>
+                            </a>
+                            <a href="/praktikum/<%= praktikum.id %>/mahasiswa/pdf" class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-white/20 transition">
+                                <i class="fa-solid fa-file-pdf w-4 h-4"></i>
+                                <span>Export PDF</span>
+                            </a>
+                            <a href="/praktikum/<%= praktikum.id %>/rekap-nilai" class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-white/20 transition">
+                                <i class="fa-solid fa-file-invoice w-4 h-4"></i>
+                                <span>Rekap Nilai</span>
+                            </a>
+                            <a href="/praktikum/<%= praktikum.id %>/absensi/detail" class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-white/20 transition">
+                                <i class="fa-solid fa-list-ol w-4 h-4"></i>
+                                <span>Detail Hadir</span>
+                            </a>
+                            <a href="/praktikum/<%= praktikum.id %>/absensi" class="inline-flex items-center gap-2 px-4 py-2 bg-white text-purple-700 text-sm font-bold rounded-lg shadow-md hover:bg-purple-100 transition">
+                                <i class="fa-solid fa-user-check w-4 h-4"></i>
+                                <span>Ambil Absensi</span>
+                            </a>
+                        </div>
+                    </header>
+
+                    <div class="my-6">
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <i class="fa-solid fa-search text-slate-400"></i>
+                            </div>
+                            <input type="text" id="mahasiswaSearch" class="block w-full rounded-md border-slate-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-slate-500 shadow-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500" placeholder="Cari berdasarkan nama atau NIM...">
+                        </div>
+                    </div>
+        
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden ring-1 ring-black/5">
+                        <table class="min-w-full">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">No</th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Nama Mahasiswa</th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Waktu Daftar</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <% if (mahasiswaList.length > 0) { %>
+                                    <% mahasiswaList.forEach((mhs, index) => { %>
+                                        <tr class="mahasiswa-row odd:bg-white even:bg-slate-50 hover:bg-purple-50 transition-colors">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500"><%= index + 1 %>.</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <p class="text-sm font-semibold text-slate-900"><%= mhs.user.username %></p>
+                                                <p class="text-xs text-slate-500 font-mono"><%= mhs.user.id %></p>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                                                <p><%= new Date(mhs.waktu_daftar).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
+                                                <p class="text-xs text-slate-500"><%= new Date(mhs.waktu_daftar).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %> WIB</p>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                    <tr id="no-results" class="hidden">
+                                        <td colspan="4" class="text-center py-16 text-slate-500">
+                                            <i class="fa-solid fa-magnifying-glass-minus text-4xl text-slate-300 mb-4"></i>
+                                            <p>Mahasiswa tidak ditemukan.</p>
+                                        </td>
+                                    </tr>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="4" class="text-center py-16 text-slate-500">
+                                            <i class="fa-solid fa-users-slash text-4xl text-slate-300 mb-4"></i>
+                                            <p>Belum ada mahasiswa yang terdaftar pada praktikum ini.</p>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('mahasiswaSearch');
+            const rows = document.querySelectorAll('.mahasiswa-row');
+            const noResultsRow = document.getElementById('no-results');
+
+            if (rows.length === 0) {
+                searchInput.disabled = true;
+                return;
+            }
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = searchInput.value.toLowerCase();
+                let visibleRowCount = 0;
+
+                rows.forEach(function(row) {
+                    const name = row.cells[1].querySelector('p.font-semibold').textContent.toLowerCase();
+                    const nim = row.cells[1].querySelector('p.font-mono').textContent.toLowerCase();
+                    
+                    if (name.includes(searchTerm) || nim.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleRowCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                if (noResultsRow) {
+                    if (visibleRowCount === 0) {
+                        noResultsRow.classList.remove('hidden');
+                    } else {
+                        noResultsRow.classList.add('hidden');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title || 'Dashboard LabCorner' %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            primary: '#6366f1', // Indigo-500
+            secondary: '#a855f7', // Purple-500
+            accent: '#ec4899' // Pink-500
+          },
+          animation: {
+            aurora: 'aurora 60s linear infinite',
+            'input-enter': 'input-enter 0.5s ease-out forwards',
+            'input-leave': 'input-leave 0.3s ease-in forwards',
+            'tag-in': 'tag-in 0.5s ease-out forwards'
+          },
+          keyframes: {
+            aurora: {
+              '0%': { transform: 'translate(0%, 0%) rotate(0deg)' },
+              '25%': { transform: 'translate(10%, -20%) rotate(20deg)' },
+              '50%': { transform: 'translate(-10%, 20%) rotate(-20deg)' },
+              '75%': { transform: 'translate(-5%, -10%) rotate(10deg)' },
+              '100%': { transform: 'translate(0%, 0%) rotate(0deg)' },
+            },
+            'input-enter': {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0px)' },
+            },
+            'input-leave': {
+              '0%': { opacity: '1', transform: 'translateY(0px)' },
+              '100%': { opacity: '0', transform: 'translateY(-20px)' },
+            },
+            'tag-in': {
+               '0%': { opacity: '0', transform: 'scale(0.8) translateY(20px)' },
+               '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .bg-gradient-animated {
+      background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .input-group { @apply relative; }
+    .form-input {
+      @apply w-full px-6 pt-8 pb-4 text-slate-800 text-xl bg-white/90 backdrop-blur-sm border-2 border-slate-200 rounded-2xl transition-all duration-300 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/30 shadow-lg;
+    }
+    .form-input:focus + .floating-label,
+    .form-input:not(:placeholder-shown) + .floating-label,
+    .floating-label.active {
+      @apply transform -translate-y-6 text-sm text-purple-600 font-bold;
+    }
+    .floating-label {
+      @apply absolute top-6 left-6 text-slate-500 text-xl transition-all duration-300 pointer-events-none;
+    }
+    .bg-purple-gradient {
+      background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+    }
+    .card-purple {
+      background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+      border: 1px solid #c4b5fd;
+      box-shadow: 0 4px 24px 0 rgba(124,58,237,0.10);
+      color: #fff;
+    }
+    input, select, textarea {
+      background: rgba(124,58,237,0.15) !important;
+      color: #fff !important;
+      border: 1px solid #a78bfa !important;
+    }
+    label, .floating-label, .form-label {
+      color: #fff !important;
+    }
+    .fade-in {
+      opacity: 0;
+      animation: fadeInAnim 0.7s ease-in-out forwards;
+    }
+    @keyframes fadeInAnim {
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+
+<body class="bg-purple-gradient min-h-screen text-white font-[Inter] overflow-hidden fade-in">
+  
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+  </div>
+
+  <div class="relative w-full max-w-4xl mx-auto px-6 py-8 z-10">
+    <header class="bg-gradient-to-r from-purple-700 via-purple-500 to-purple-400 shadow-lg border-b border-purple-300 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-3">
+          <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+              <i class="fas fa-flask text-white text-lg"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-white">LabCorner</h1>
+              <p class="text-xs text-purple-200">Laboratory Management System</p>
+            </div>
+          </div>
+          <a href="/admin" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg flex items-center gap-2">
+            <span class="text-xl">←</span>
+            <span>Kembali ke Dashboard</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-white/30 card-purple">
+        <div id="formContainer" class="overflow-hidden min-h-[100px]">
+            <div class="form-step" data-step="0">
+                <div class="input-group">
+                    <input type="text" id="nim" name="nim" class="form-input" placeholder=" " required />
+                    <label for="nim" class="floating-label">🆔 Masukkan NIM (ID)</label>
+                </div>
+            </div>
+            <div class="form-step hidden" data-step="1">
+                <div class="input-group">
+                    <input type="text" id="nama" name="nama" class="form-input" placeholder=" " required />
+                    <label for="nama" class="floating-label">🧑 Siapa nama lengkap user?</label>
+                </div>
+            </div>
+            <div class="form-step hidden" data-step="2">
+                <div class="input-group">
+                    <input type="text" id="username" name="username" class="form-input" placeholder=" " required />
+                    <label for="username" class="floating-label">🆔 Buat username yang unik</label>
+                </div>
+            </div>
+            <div class="form-step hidden" data-step="3">
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="form-input pr-16" placeholder=" " required />
+                    <label for="password" class="floating-label">🔒 Masukkan password</label>
+                    <button type="button" id="togglePassword" class="absolute top-1/2 right-6 -translate-y-1/2 text-white/70 hover:text-white text-2xl">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-step hidden" data-step="4">
+                <div class="input-group">
+                    <select name="peran" id="peran" class="form-input text-xl" required>
+                        <option value="" disabled selected>-- Pilih Peran --</option>
+                        <option value="mahasiswa">mahasiswa</option>
+                        <option value="asisten">asisten</option>
+                        <option value="admin">admin</option>
+                    </select>
+                    <label for="peran" class="floating-label active">👥 Apa perannya?</label>
+                </div>
+            </div>
+            <div class="form-step hidden" data-step="5" id="labStep">
+                <div class="input-group">
+                    <select name="lab_id" id="lab_id" class="form-input text-xl">
+                        <option value="" disabled selected>-- Pilih Lab Asisten --</option>
+                        <% labs.forEach(function(lab) { %>
+                            <option value="<%= lab.id %>"><%= lab.nama_lab %></option>
+                        <% }); %>
+                    </select>
+                    <label for="lab_id" class="floating-label active">🧪 Pilih Lab Asisten</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10">
+            <h3 class="text-2xl font-bold text-slate-700 mb-6">📋 Preview Data:</h3>
+            <div id="collectedData" class="flex flex-wrap gap-4 min-h-[80px] p-6 bg-slate-100/80 rounded-2xl border-2 border-slate-200">
+                </div>
+        </div>
+
+        <div class="mt-10 pt-8 border-t-2 border-slate-200">
+            <button type="button" id="submitBtn" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-2xl font-black px-8 py-6 rounded-2xl shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-purple-500/40 hover:scale-105 active:scale-100">
+                <span class="btn-text">Lengkapi semua data</span>
+            </button>
+        </div>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed top-6 right-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl transform translate-x-[120%] transition-transform duration-500 z-50 text-xl font-bold"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const steps = Array.from(document.querySelectorAll('.form-step'));
+        const inputs = {
+            nim: document.getElementById('nim'),
+            nama: document.getElementById('nama'),
+            username: document.getElementById('username'),
+            password: document.getElementById('password'),
+            peran: document.getElementById('peran'),
+            lab_id: document.getElementById('lab_id')
+        };
+        const collectedDataContainer = document.getElementById('collectedData');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        let currentStep = 0;
+        const formData = {};
+
+        const goToStep = (stepIndex) => {
+            if (stepIndex >= steps.length) {
+                btnText.textContent = '➕ Tambah User';
+                submitBtn.disabled = false;
+                return;
+            }
+            steps.forEach((step, index) => {
+                if (index === stepIndex) {
+                    step.classList.remove('hidden', 'animate-input-leave');
+                    step.classList.add('animate-input-enter');
+                    const input = step.querySelector('input, select');
+                    if (input) input.focus();
+                } else {
+                    step.classList.add('hidden');
+                }
+            });
+            currentStep = stepIndex;
+        };
+
+        const addDataTag = (key, value, icon) => {
+            const existingTag = document.querySelector(`[data-key="${key}"]`);
+            if(existingTag) existingTag.remove();
+
+            const tag = document.createElement('div');
+            tag.className = 'flex items-center gap-3 bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 px-6 py-4 rounded-2xl animate-tag-in text-lg font-bold border-2 border-purple-200';
+            tag.dataset.key = key;
+            tag.innerHTML = `<span class="text-2xl">${icon}</span><span class="font-bold">${value}</span>`;
+            collectedDataContainer.appendChild(tag);
+        };
+        
+        const handleStepCompletion = (inputElement) => {
+            const key = inputElement.name;
+            let value = inputElement.value;
+            let icon = '';
+
+            if (value.trim() === '') return;
+
+             // **FIX:** Store the real password in formData first.
+            if (key === 'password') {
+                formData.password = value;
+            }
+
+            switch(key) {
+                case 'nim': icon = '🆔'; break;
+                case 'nama': icon = '🧑'; break;
+                case 'username': icon = '🆔'; break;
+                case 'password': value = '••••••••'; icon = '🔒'; break; // Now this only affects the display value
+                case 'peran': value = inputElement.options[inputElement.selectedIndex].text; icon = '👥'; break;
+                case 'lab_id': icon = '🧪'; value = inputElement.options[inputElement.selectedIndex].text; break;
+            }
+            
+            addDataTag(key, value, icon);
+            // Store all other data in formData
+            if (key !== 'password') {
+              formData[key] = inputElement.value;
+            }
+            
+            if (key === 'peran' && inputElement.value === 'asisten') {
+                goToStep(currentStep + 1); // Show lab step
+            } else if (key === 'peran') {
+                // If role is not 'asisten', skip the lab step
+                goToStep(currentStep + 2); 
+            } else {
+                goToStep(currentStep + 1);
+            }
+        };
+        
+        Object.values(inputs).forEach(input => {
+            if (!input) return;
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && input.type !== 'select-one') {
+                    e.preventDefault();
+                    handleStepCompletion(e.target);
+                }
+            });
+            if (input.type === 'select-one') {
+                input.addEventListener('change', (e) => handleStepCompletion(e.target));
+            }
+        });
+
+        togglePasswordBtn.addEventListener('click', () => {
+            const passwordInput = inputs.password;
+            const icon = togglePasswordBtn.querySelector('i');
+            const isPassword = passwordInput.type === 'password';
+            
+            passwordInput.type = isPassword ? 'text' : 'password';
+            icon.classList.toggle('fa-eye', !isPassword);
+            icon.classList.toggle('fa-eye-slash', isPassword);
+        });
+
+        submitBtn.addEventListener('click', async () => {
+            if (!formData.nim || !formData.nama || !formData.username || !formData.password || !formData.peran || (formData.peran === 'asisten' && !formData.lab_id)) {
+                showToast('❌ Lengkapi semua data terlebih dahulu', 'error');
+                return;
+            }
+
+            if (formData.peran === 'asisten') {
+                formData.lab_id = parseInt(inputs.lab_id.value, 10);
+            }
+
+            submitBtn.disabled = true;
+            btnText.textContent = '⏳ Menambahkan...';
+
+            try {
+                const response = await fetch('/user/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('✅ ' + result.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = '/user';
+                    }, 2000);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showToast('❌ ' + (error.message || 'Terjadi kesalahan'), 'error');
+                submitBtn.disabled = false;
+                btnText.textContent = '➕ Tambah User';
+            }
+        });
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `fixed top-6 right-6 px-8 py-4 rounded-2xl shadow-2xl transform translate-x-[120%] transition-transform duration-500 z-50 text-xl font-bold ${type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' : 'bg-gradient-to-r from-red-500 to-pink-600 text-white'}`;
+            setTimeout(() => toast.classList.remove('translate-x-[120%]'), 100);
+            setTimeout(() => toast.classList.add('translate-x-[120%]'), 4000);
+        }
+    });
+  </script>
+</body>
+</html>

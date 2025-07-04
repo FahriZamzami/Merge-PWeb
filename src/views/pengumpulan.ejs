@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Pengumpulan - LABCORNER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-[#F9F5FF]">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { praktikum }) %>
+
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            <main class="flex-1 p-10">
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex border-b-2 border-gray-200 space-x-2">
+                            <a href="/assignments/<%= assignment.id %>/pengumpulan" 
+                                class="px-6 py-2 text-lg font-bold border-b-4 
+                                <%= activeTab === 'pengumpul' ? 'text-purple-700 border-purple-700' : 'text-gray-500 border-transparent hover:text-purple-700' %>">
+                                Pengumpul
+                            </a>
+                            <a href="/assignments/<%= assignment.id %>/files" 
+                                class="px-6 py-2 text-lg font-bold border-b-4 
+                                <%= activeTab === 'file' ? 'text-purple-700 border-purple-700' : 'text-gray-500 border-transparent hover:text-purple-700' %>">
+                                File
+                            </a>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-700"><%= assignment.judul %></h2>
+                    </div>
+
+                    <div class="mt-6 text-left">
+                        <a href="/penugasan/detail/<%= assignment.id %>" class="text-purple-600 hover:underline font-medium">
+                            ← Kembali
+                        </a>
+                    </div>
+
+                    <div class="bg-[#F3E8FF] rounded-xl p-6 space-y-3">
+                        <% if (submissions && submissions.length > 0) { %>
+                            <% const batasWaktu = new Date(assignment.batas_waktu); %>
+                            <% submissions.forEach(sub => { 
+                                const terlambat = new Date(sub.waktu_kirim) > batasWaktu;
+                            %>
+                                <div class="bg-white p-4 rounded-xl shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                                    <div class="flex items-center gap-4">
+                                        <div class="bg-gray-200 p-2 rounded-full">
+                                            <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-gray-800"><%= sub.user?.username || 'Tidak diketahui' %></p>
+                                            <p class="text-sm text-gray-500"><%= sub.hari %>, <%= sub.tanggal %> <%= sub.jam %></p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <span class="px-4 py-1.5 text-sm font-semibold rounded-full 
+                                            <%= terlambat ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' %>">
+                                            <%= terlambat ? 'Terlambat' : 'Tepat Waktu' %>
+                                        </span>
+
+                                        <a href="/assignments/nilai/<%= sub.id %>" 
+                                            class="text-sm text-purple-700 hover:underline font-medium">
+                                            Beri Nilai
+                                        </a>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <div class="text-center py-12">
+                                <p class="text-gray-500">Belum ada mahasiswa yang mengumpulkan tugas ini.</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

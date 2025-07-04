@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title><%= title %></title>
+</head>
+<body class="bg-purple-50">
+    <div class="flex h-screen">
+        <%- include('partials/sidebar', { praktikum: praktikum }) %>
+
+        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <header class="mb-8">
+                <a href="/praktikum/<%= praktikum.id %>/kuis" class="text-purple-600 hover:underline flex items-center mb-4">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Kembali ke Daftar Kuis
+                </a>
+                <h1 class="text-3xl font-bold text-gray-800">Edit Kuis</h1>
+                <p class="text-gray-500">Praktikum: <%= praktikum.nama_praktikum %></p>
+            </header>
+
+            <div class="bg-white rounded-lg shadow p-6 max-w-4xl mx-auto">
+                <form action="/kuis/<%= kuis.id %>/edit" method="POST">
+                    <input type="hidden" name="praktikum_id" value="<%= praktikum.id %>">
+                    
+                    <div class="mb-6">
+                        <label for="judul" class="block text-xl font-medium text-gray-800 mb-2">Judul Kuis</label>
+                        <input type="text" id="judul" name="judul" value="<%= kuis.judul %>" required 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="deskripsi" class="block text-xl font-medium text-gray-800 mb-2">Deskripsi</label>
+                        <textarea id="deskripsi" name="deskripsi" rows="4"
+                                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"><%= kuis.deskripsi %></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="waktu_mulai" class="block text-lg font-medium text-gray-800 mb-2">Waktu Mulai</label>
+                            <input type="datetime-local" id="waktu_mulai" name="waktu_mulai" value="<%= new Date(kuis.waktu_mulai).toISOString().slice(0,16) %>" required
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label for="waktu_selesai" class="block text-lg font-medium text-gray-800 mb-2">Waktu Selesai</label>
+                            <input type="datetime-local" id="waktu_selesai" name="waktu_selesai" value="<%= new Date(kuis.waktu_selesai).toISOString().slice(0,16) %>" required
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <label for="durasi_menit" class="block text-lg font-medium text-gray-800 mb-2">Durasi Pengerjaan (menit)</label>
+                        <input type="number" id="durasi_menit" name="durasi_menit" value="<%= kuis.durasi_menit %>" min="1" required
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300 text-lg">
+                            <i class="fas fa-save mr-2"></i> Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html> 

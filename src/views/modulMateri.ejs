@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= title %></title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    .card-hover { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .card-hover:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+</style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+
+<div class="flex min-h-screen">
+
+<%- include('partials/sidebarMahasiswa', { currentPage: 'modul', praktikum: praktikum, user: user }) %>
+
+<main class="flex-1 p-6 lg:p-8 max-w-7xl mx-auto">
+    <div class="mb-8 text-center lg:text-left">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mb-4 lg:mb-6">
+            <i class="fas fa-book-open text-white text-2xl"></i>
+        </div>
+        <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-3">Modul Materi</h1>
+        <% if (praktikum) { %>
+            <p class="text-xl text-gray-600 mb-2">Kumpulan modul untuk praktikum <%= praktikum.nama_praktikum %></p>
+        <% } %>
+        <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto lg:mx-0 rounded-full"></div>
+    </div>
+
+    <div class="mb-8">
+        <div class="relative max-w-lg mx-auto lg:mx-0">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-4">
+                <i class="fas fa-search text-gray-400"></i>
+            </span>
+            <input type="text" id="searchInput" placeholder="Cari judul modul..." class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:max-w-sm gap-6 mb-8">
+        <div class="bg-white rounded-2xl shadow-lg p-6 card-hover border-l-4 border-blue-500">
+            <div class="flex items-center">
+                <div class="p-3 bg-blue-100 rounded-full"><i class="fas fa-book-open text-blue-600 text-xl"></i></div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Modul</p>
+                    <p class="text-2xl font-bold text-gray-900"><%= moduls.length %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="gradient-bg px-8 py-6">
+            <h2 class="text-2xl font-bold text-white">📚 Daftar Modul</h2>
+        </div>
+        <div class="p-8">
+            <div id="modulGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <% if (moduls.length > 0) { %>
+                    <% moduls.forEach(function(modul, idx) { %>
+                    <% 
+                        const colors = [ 'from-amber-100 to-orange-200', 'from-rose-100 to-pink-200', 'from-blue-100 to-indigo-200', 'from-emerald-100 to-teal-200' ];
+                        const colorClass = colors[idx % colors.length];
+                    %>
+                    <div class="modul-card bg-gradient-to-br <%= colorClass %> rounded-3xl shadow-xl overflow-hidden card-hover">
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold text-gray-800 mb-3"><%= modul.judul %></h3>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-500 text-xs font-medium"><%= modul.file_path %></span>
+                                <a href="/praktikum/<%= praktikum.id %>/modul-materi/<%= modul.id %>/download" 
+                                    class="bg-white bg-opacity-60 hover:bg-opacity-80 text-gray-700 px-5 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-lg">
+                                <i class="fas fa-download mr-2"></i>Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="col-span-full text-center py-16">
+                        <h3 class="text-2xl font-bold text-gray-900">Belum Ada Modul</h3>
+                        <p class="text-gray-600 text-lg">Modul untuk praktikum ini belum diunggah.</p>
+                    </div>
+                <% } %>
+            </div>
+            <div id="noResultsMessage" class="text-center py-16 hidden">
+                <h3 class="text-2xl font-bold text-gray-900">Modul Tidak Ditemukan</h3>
+                <p class="text-gray-600 text-lg">Tidak ada modul yang cocok dengan pencarian Anda.</p>
+            </div>
+        </div>
+    </div>
+</main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('searchInput');
+        const modulGrid = document.getElementById('modulGrid');
+        const modulCards = modulGrid.querySelectorAll('.modul-card');
+        const noResultsMessage = document.getElementById('noResultsMessage');
+
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            let visibleCount = 0;
+
+            modulCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                if (title.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                noResultsMessage.style.display = 'block';
+            } else {
+                noResultsMessage.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
